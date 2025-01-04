@@ -6,14 +6,12 @@ import 'package:csm_view/csm_view.dart';
 /// NOTE: remember that if you want to use the [RouteDriver] you should use this instance objects
 /// case that manager uses a combination of calculations and hashcode of [RouteOptions] objects
 /// to generate absolute pathing and another behaviors.
-class TWSARoutes {
+final class TWSARoutes {
   static const CSMRouteOptions loginPage = CSMRouteOptions('/');
   static const CSMRouteOptions overviewPage = CSMRouteOptions('overview');
   static const CSMRouteOptions securityPage = CSMRouteOptions('security');
   static const CSMRouteOptions businessPage = CSMRouteOptions('business');
   static const CSMRouteOptions yardlogPage = CSMRouteOptions('yard-logs');
-  static const CSMRouteOptions humanResourcesPage = CSMRouteOptions('human-resources');
-
 
   static const CSMRouteOptions settings = CSMRouteOptions('settings');
   static const CSMRouteOptions profile = CSMRouteOptions('profile');
@@ -54,6 +52,10 @@ class TWSARoutes {
 
   static const CSMRouteOptions yardlogsTruckInventoryArticle = CSMRouteOptions('trucks-inventory');
 
+
+  // --> HUMAN RESOURCES
+  static const CSMRouteOptions humanResourcesPage = CSMRouteOptions('human-resources');
   static const CSMRouteOptions contactsArticle = CSMRouteOptions('contacts');
+  static const CSMRouteOptions contactsCreateWhisper = CSMRouteOptions('contacts-create');
 
 }

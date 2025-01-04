@@ -12,6 +12,7 @@ import 'package:tws_administration_view/view/layouts/master/master_layout.dart';
 import 'package:tws_administration_view/view/pages/about/about_page.dart';
 import 'package:tws_administration_view/view/pages/business/business_page.dart';
 import 'package:tws_administration_view/view/pages/human_resources/articles/contacts/contacts_article.dart';
+import 'package:tws_administration_view/view/pages/human_resources/articles/contacts/whispers/contacts_create_whisper.dart';
 import 'package:tws_administration_view/view/pages/human_resources/human_resources_page.dart';
 import 'package:tws_administration_view/view/pages/login/login_page.dart';
 import 'package:tws_administration_view/view/pages/overview/overview_page.dart';
@@ -25,7 +26,7 @@ typedef Routes = TWSARoutes;
 class TWSARouteTree extends CSMRouterTreeBase {
   TWSARouteTree()
       : super(
-          devRoute: Routes.contactsArticle,
+          devRoute: Routes.contactsCreateWhisper,
           redirect: (_, __) {
             return null;
           },
@@ -141,6 +142,15 @@ class TWSARouteTree extends CSMRouterTreeBase {
                     CSMRouteNode(
                       TWSARoutes.contactsArticle,
                       pageBuild: (BuildContext ctx, CSMRouterOutput output) => const ContactsArticle(),
+                      routes: <CSMRouteBase>[
+                        CSMRouteWhisper<Object>(
+                          TWSARoutes.contactsCreateWhisper,
+                          whisperOptions: CSMRouteWhisperOptions(
+                            padding: EdgeInsets.zero,
+                          ),
+                          pageBuild: (_, __) => ContactsCreateWhisper(),
+                        ),
+                      ],
                     ),
                   ],
                 ),

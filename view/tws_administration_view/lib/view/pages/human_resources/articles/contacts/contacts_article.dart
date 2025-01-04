@@ -10,11 +10,13 @@ import 'package:tws_administration_view/view/components/tws_article_table/tws_ar
 import 'package:tws_administration_view/view/components/tws_article_table/tws_article_table_field_options.dart';
 import 'package:tws_administration_view/view/components/tws_property_viewer.dart';
 import 'package:tws_administration_view/view/frames/article/action_ribbon_options.dart';
+import 'package:tws_administration_view/view/frames/article/actions/maintenance_group_options.dart';
 import 'package:tws_administration_view/view/pages/human_resources/human_resources_frame.dart';
 import 'package:tws_foundation_client/tws_foundation_client.dart';
 
 // --> Services
 final SessionStorage _sessionStorage = SessionStorage.i;
+final CSMRouter _router = CSMRouter.i;
 
 final class ContactsArticle extends CSMPageBase {
   const ContactsArticle({super.key});
@@ -27,6 +29,9 @@ final class ContactsArticle extends CSMPageBase {
       currentRoute: TWSARoutes.contactsArticle,
       actionsOptions: ActionRibbonOptions(
         refresher: tableAgent.refresh,
+        maintenanceGroupConfig: MaintenanceGroupOptions(
+          onCreate: () => _router.drive(TWSARoutes.contactsCreateWhisper),
+        ),
       ),
       article: TWSArticleTable<Contact>(
         fields: <TWSArticleTableFieldOptions<Contact>>[
@@ -39,8 +44,12 @@ final class ContactsArticle extends CSMPageBase {
             (Contact item, int index, BuildContext ctx) => item.lastName.isEmpty ? '---' : item.lastName,
           ),
           TWSArticleTableFieldOptions<Contact>(
-            'Email',
+            'E-Mail',
             (Contact item, int index, BuildContext ctx) => item.email,
+          ),
+          TWSArticleTableFieldOptions<Contact>(
+            'Phone',
+            (Contact item, int index, BuildContext ctx) => item.phone,
           ),
         ],
         adapter: const ContactsTableAdapter(),
