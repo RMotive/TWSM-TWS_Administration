@@ -987,19 +987,10 @@ final class _TableAdapter extends TWSArticleTableAdapter<Driver> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   onPressed: (bool isShowing) {
                     //Creates a new approach object.
-                    if(isShowing){
-                      set = set.clone(
-                        employeeNavigation: set.employeeNavigation?.clone(
-                          approachNavigation: Approach.a()
-                        ),
-                      );
-                      return;
-                    }
-                
-                    //Removing the approach object.
                     set = set.clone(
                       employeeNavigation: set.employeeNavigation?.clone(
-                        approach: 0,
+                        approachNavigation: isShowing? Approach.a() : null,
+                        approach: !isShowing? 0 : null,
                       ),
                     );
                   },
@@ -1272,17 +1263,9 @@ final class _TableAdapter extends TWSArticleTableAdapter<Driver> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 onPressed: (bool isShowing) {
                   //Creates a new address object.
-                  if(isShowing){
-                    set = set.clone(
-                      employeeNavigation: set.employeeNavigation?.clone(
-                        addressNavigation: Address.a()
-                      )
-                    );
-                    return;
-                  }
-                  //Removing the address object.
                   set = set.clone(
                     employeeNavigation: set.employeeNavigation?.clone(
+                      addressNavigation: isShowing? Address.a() : null,
                       address: 0,
                     )
                   );

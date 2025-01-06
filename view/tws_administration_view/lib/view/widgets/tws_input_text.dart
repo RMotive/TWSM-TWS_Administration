@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:csm_view/csm_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tws_administration_view/core/theme/bases/twsa_theme_base.dart';
 
 /// TWS Business dedicated component
@@ -34,6 +35,8 @@ class TWSInputText extends StatefulWidget {
   final void Function(String text)? onChanged;
   final Function(PointerDownEvent)? onTapOutside;
   final Duration? deBounce;
+  final List<TextInputFormatter>? formatter;
+  final TextInputType? keyboardType;
   const TWSInputText({
     super.key,
     this.label,
@@ -60,6 +63,8 @@ class TWSInputText extends StatefulWidget {
     this.maxLines = 1,
     this.isEnabled = true,
     this.isPrivate = false,
+    this.formatter,
+    this.keyboardType,
   });
 
   @override
@@ -156,6 +161,8 @@ class _TWSInputTextState extends State<TWSInputText> {
           cursorWidth: 3,
           cursorColor: colorStruct.foreAlt,
           enabled: widget.isEnabled,
+          inputFormatters: widget.formatter,
+          keyboardType: widget.keyboardType,
           onChanged: (String typedText) {
             if (widget.deBounce == null) {
               widget.onChanged?.call(typedText);

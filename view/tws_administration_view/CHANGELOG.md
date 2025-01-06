@@ -61,7 +61,11 @@
     35. Added an optional [TimePicker] dialog in [TWSDatetimePicker] to add the time to the date.
     36. Added update feature to [Yardlog] view table.
     37. Removing text gap in [TWSImageViewer] when is not necesary.
-    
+    38. Added [Locations] Article.
+    39. Added [View] table, [Create] & [Update] whispers for [Locations] article.
+    40. Added the following parameters for [TWSInputText]:
+        - [Formatter] Property.
+        - [KeyboardType] Property.
 - Dependencies upgrade:
     1. (-) tws_foundation_client: Deprecated now used tws_foundation_client
     2. (-) csm_view: Deprecated now used csm_view

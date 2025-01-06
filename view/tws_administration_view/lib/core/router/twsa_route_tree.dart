@@ -5,6 +5,8 @@ import 'package:tws_administration_view/view/articles/drivers/drivers_article.da
 import 'package:tws_administration_view/view/articles/drivers/whispers/drivers_create_whisper.dart';
 import 'package:tws_administration_view/view/articles/features/features_article.dart';
 import 'package:tws_administration_view/view/articles/features/whispers/create/features_create_whisper.dart';
+import 'package:tws_administration_view/view/articles/locations/locations_article.dart';
+import 'package:tws_administration_view/view/articles/locations/whispers/locations_create_whisper.dart';
 import 'package:tws_administration_view/view/articles/solutions/solutions_article.dart';
 import 'package:tws_administration_view/view/articles/solutions/whispers/solutions_create_whisper.dart';
 import 'package:tws_administration_view/view/articles/trailers/trailers_article.dart';
@@ -29,7 +31,7 @@ typedef Routes = TWSARoutes;
 class TWSARouteTree extends CSMRouterTreeBase {
   TWSARouteTree()
       : super(
-          devRoute: Routes.yardlogPage,
+          devRoute: Routes.locationsArticle,
           redirect: (_, __) {
             return null;
           },
@@ -128,7 +130,9 @@ class TWSARouteTree extends CSMRouterTreeBase {
                         // -> [Create]
                         CSMRouteWhisper<Object>(
                           Routes.trucksCreateWhisper,
-                          whisperOptions: const CSMRouteWhisperOptions(),
+                          whisperOptions: const CSMRouteWhisperOptions(
+                            padding: EdgeInsets.zero,
+                          ),
                           pageBuild: (BuildContext ctx, CSMRouterOutput output) => const TrucksCreateWhisper(),
                         ),
                       ],
@@ -141,7 +145,9 @@ class TWSARouteTree extends CSMRouterTreeBase {
                         // -> [Create]
                         CSMRouteWhisper<Object>(
                           Routes.trailersCreateWhisper,
-                          whisperOptions: const CSMRouteWhisperOptions(),
+                          whisperOptions: const CSMRouteWhisperOptions(
+                            padding: EdgeInsets.zero,
+                          ),
                           pageBuild: (BuildContext ctx, CSMRouterOutput output) => const TrailersCreateWhisper(),
                         ),
                       ],
@@ -155,8 +161,26 @@ class TWSARouteTree extends CSMRouterTreeBase {
                         // -> [Create]
                         CSMRouteWhisper<Object>(
                           Routes.driversCreateWhisper,
-                          whisperOptions: const CSMRouteWhisperOptions(),
+                          whisperOptions: const CSMRouteWhisperOptions(
+                            padding: EdgeInsets.zero,
+                          ),
                           pageBuild: (BuildContext ctx, CSMRouterOutput output) => const DriversCreateWhisper(),
+                        ),
+                      ],
+                    ),
+
+                    // --> [Locations]
+                    CSMRouteNode(
+                      Routes.locationsArticle,
+                      pageBuild: (_, __) => const LocationsArticle(),
+                      routes: <CSMRouteBase>[
+                        // --> [Create]
+                        CSMRouteWhisper<Object>(
+                          Routes.locationsCreateWhisper,
+                          whisperOptions: const CSMRouteWhisperOptions(
+                            padding: EdgeInsets.zero,
+                          ),
+                          pageBuild: (BuildContext ctx, CSMRouterOutput output) => const LocationsCreateWhisper(),
                         ),
                       ],
                     ),
