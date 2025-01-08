@@ -7,6 +7,8 @@ import 'package:tws_administration_view/view/articles/features/features_article.
 import 'package:tws_administration_view/view/articles/features/whispers/create/features_create_whisper.dart';
 import 'package:tws_administration_view/view/articles/locations/locations_article.dart';
 import 'package:tws_administration_view/view/articles/locations/whispers/locations_create_whisper.dart';
+import 'package:tws_administration_view/view/articles/sections/sections_article.dart';
+import 'package:tws_administration_view/view/articles/sections/whispers/sections_create_whisper.dart';
 import 'package:tws_administration_view/view/articles/solutions/solutions_article.dart';
 import 'package:tws_administration_view/view/articles/solutions/whispers/solutions_create_whisper.dart';
 import 'package:tws_administration_view/view/articles/trailers/trailers_article.dart';
@@ -31,7 +33,7 @@ typedef Routes = TWSARoutes;
 class TWSARouteTree extends CSMRouterTreeBase {
   TWSARouteTree()
       : super(
-          devRoute: Routes.locationsArticle,
+          devRoute: Routes.sectionsArticle,
           redirect: (_, __) {
             return null;
           },
@@ -181,6 +183,22 @@ class TWSARouteTree extends CSMRouterTreeBase {
                             padding: EdgeInsets.zero,
                           ),
                           pageBuild: (BuildContext ctx, CSMRouterOutput output) => const LocationsCreateWhisper(),
+                        ),
+                      ],
+                    ),
+                    
+                    // --> [Sections]
+                    CSMRouteNode(
+                      Routes.sectionsArticle,
+                      pageBuild: (_, __) => const SectionsArticle(),
+                      routes: <CSMRouteBase>[
+                        // --> [Create]
+                        CSMRouteWhisper<Object>(
+                          Routes.sectionsCreateWhisper,
+                          whisperOptions: const CSMRouteWhisperOptions(
+                            padding: EdgeInsets.zero,
+                          ),
+                          pageBuild: (BuildContext ctx, CSMRouterOutput output) => const SectionsCreateWhisper(),
                         ),
                       ],
                     ),

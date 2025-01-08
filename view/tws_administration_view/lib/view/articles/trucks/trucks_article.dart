@@ -3,7 +3,6 @@ import 'package:csm_view/csm_view.dart' hide JObject;
 import 'package:flutter/material.dart';
 import 'package:tws_administration_view/core/constants/twsa_colors.dart';
 import 'package:tws_administration_view/core/constants/twsa_common_displays.dart';
-import 'package:tws_administration_view/core/extension/datetime.dart';
 import 'package:tws_administration_view/core/router/twsa_routes.dart';
 import 'package:tws_administration_view/data/services/sources.dart';
 import 'package:tws_administration_view/data/storages/session_storage.dart';

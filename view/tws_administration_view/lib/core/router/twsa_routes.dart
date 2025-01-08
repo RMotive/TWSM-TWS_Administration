@@ -41,6 +41,11 @@ class TWSARoutes {
   static const CSMRouteOptions locationsCreateWhisper = CSMRouteOptions('add-location');
   static const CSMRouteOptions locationsViewWhisper = CSMRouteOptions(name: 'location-view', 'view');
 
+  static const CSMRouteOptions sectionsArticle = CSMRouteOptions('sections');
+  static const CSMRouteOptions sectionsCreateWhisper = CSMRouteOptions('add-section');
+  static const CSMRouteOptions sectionsViewWhisper = CSMRouteOptions(name: 'section-view', 'view');
+
+
   static const CSMRouteOptions manufacturersArticle = CSMRouteOptions('manufacturers');
   static const CSMRouteOptions manufacturersViewWhisper = CSMRouteOptions(name: 'manufacturers-view', 'view');
   static const CSMRouteOptions manufacturersCreateWhisper = CSMRouteOptions(name: 'manufacturers-create', 'create');

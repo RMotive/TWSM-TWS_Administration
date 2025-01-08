@@ -22,7 +22,7 @@ import 'package:tws_administration_view/view/widgets/tws_section.dart';
 import 'package:tws_administration_view/view/widgets/tws_section_divider.dart';
 import 'package:tws_foundation_client/tws_foundation_client.dart';
 
-part '../options/adapters/locations_whisper_options_adapter.dart';
+part '../adapters/locations_whisper_options_adapter.dart';
 part 'forms/location_stack_item.dart';
 part 'forms/locations_create_address_form.dart';
 part 'forms/locations_create_waypoint_form.dart';
@@ -35,7 +35,7 @@ const List<String> _mxStateOptions = TWSAMessages.kMXStateCodes;
 class LocationsCreateWhisper  extends CSMPageBase{
   const LocationsCreateWhisper({super.key});
 
-  Future<List<TWSArticleCreatorFeedback>> _onCreateTrailers(List<Location> records, BuildContext context) async {
+  Future<List<TWSArticleCreatorFeedback>> _onCreateLocations(List<Location> records, BuildContext context) async {
     final String token = _sessionStorage.getTokenStrict();
     List<TWSArticleCreatorFeedback> feedback = <TWSArticleCreatorFeedback>[];
 
@@ -80,7 +80,7 @@ class LocationsCreateWhisper  extends CSMPageBase{
           return model.evaluate().isEmpty;
         },
         onCreate: (List<Location> records) async {
-          return _onCreateTrailers(records, ctx);
+          return _onCreateLocations(records, ctx);
         },
         itemDesigner: (Location actualModel, bool selected, bool valid) {
           return _LocationStackItem(actualModel: actualModel, selected: selected, valid: valid );
@@ -97,7 +97,7 @@ class LocationsCreateWhisper  extends CSMPageBase{
                 children: <Widget>[
                   TWSInputText(
                     width: double.maxFinite,
-                    maxLength: 100,
+                    maxLength: 30,
                     label: 'Name',
                     isStrictLength: false,
                     controller: TextEditingController(text: itemState?.model.name),

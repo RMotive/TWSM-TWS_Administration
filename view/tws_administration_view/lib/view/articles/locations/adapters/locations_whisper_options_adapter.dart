@@ -1,4 +1,4 @@
-part of '../../whispers/locations_create_whisper.dart';
+part of '../whispers/locations_create_whisper.dart';
 
 final SessionStorage _sessionStorage = SessionStorage.i;
 

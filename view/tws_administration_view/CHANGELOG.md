@@ -66,6 +66,9 @@
     40. Added the following parameters for [TWSInputText]:
         - [Formatter] Property.
         - [KeyboardType] Property.
+    41. Extensions files removed and migrated to foundation environment.
+    42. Added [Sections] article.
+
 - Dependencies upgrade:
     1. (-) tws_foundation_client: Deprecated now used tws_foundation_client
     2. (-) csm_view: Deprecated now used csm_view

@@ -9,26 +9,6 @@ class _LocationsCreateWaypointForm extends StatelessWidget {
     this.enable = true,
   });
 
-  /// Validate if a decimal value pass the number length paramaters.
-  /// Returns TRUE when the double value is valid, else, return FALSE.
-  bool validateDecimal(String value, {int maxIntegers = 4, int maxDecimals = 6}){
-    //skip default values.
-    if(value == "0" || value == "0.0") return true;
-    double? parsedValue = double.tryParse(value);
-    //validate if the text input actually is a decimal value.
-    if(parsedValue == null) return false;
-
-    List<String> parts = value.split('.');
-    int integers = parts[0].length;
-    int decimals = parts.length > 1? parts[1].length : 0;
-
-    if(decimals <= 0) return false;
-    if(decimals > maxDecimals) return false;
-    if(integers > maxIntegers) return false;
-
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
     return TWSSection(
@@ -48,10 +28,10 @@ class _LocationsCreateWaypointForm extends StatelessWidget {
                   isEnabled: enable,
                   maxLength: 11,
                   keyboardType: TextInputType.number,
-                  showErrorColor: !validateDecimal(itemState?.model.waypointNavigation?.longitude.toString() ?? "0.0"),
+                  showErrorColor: !(itemState?.model.waypointNavigation?.longitude.toString() ?? "0.0").evaluateAsDecimal(),
                   controller: TextEditingController(text: itemState?.model.waypointNavigation?.longitude.toString()),
                   formatter: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.-]'))
                   ],
                   onChanged: (String text) {
                     Location model = itemState!.model;
@@ -74,10 +54,10 @@ class _LocationsCreateWaypointForm extends StatelessWidget {
                   isEnabled: enable,
                   maxLength: 11,
                   keyboardType: TextInputType.number,
-                  showErrorColor: !validateDecimal(itemState?.model.waypointNavigation?.latitude.toString() ?? "0.0"),
+                  showErrorColor: !(itemState?.model.waypointNavigation?.latitude.toString() ?? "0.0").evaluateAsDecimal(),
                   controller: TextEditingController(text: itemState?.model.waypointNavigation?.latitude.toString()),
                   formatter: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.-]'))
                   ],
                   onChanged: (String text) {
                     Location model = itemState!.model;
@@ -106,10 +86,10 @@ class _LocationsCreateWaypointForm extends StatelessWidget {
                   isEnabled: enable,
                   maxLength: 11,
                   keyboardType: TextInputType.number,
-                  showErrorColor: itemState?.model.waypointNavigation?.altitude != null? !validateDecimal(itemState?.model.waypointNavigation?.altitude.toString() ?? "") : false,
+                  showErrorColor: itemState?.model.waypointNavigation?.altitude != null? !(itemState?.model.waypointNavigation?.altitude.toString() ?? "").evaluateAsDecimal() : false,
                   controller: TextEditingController(text: itemState?.model.waypointNavigation?.altitude.toString()),
                   formatter: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.-]'))
                   ],
                   onChanged: (String text) {
                     Location model = itemState!.model;

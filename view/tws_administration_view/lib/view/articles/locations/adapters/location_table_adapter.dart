@@ -1,4 +1,4 @@
-part of '../../locations_article.dart';
+part of '../locations_article.dart';
 final SessionStorage _sessionStorage = SessionStorage.i;
 const List<String> _countryOptions = TWSAMessages.kCountryList;
 const List<String> _usaStateOptions = TWSAMessages.kUStateCodes;
@@ -76,25 +76,7 @@ final class _TableAdapter extends TWSArticleTableAdapter<Location> {
     );
     return view;
   }
-  /// Validate if a decimal value pass the number length paramaters.
-  /// Returns TRUE when the double value is valid, else, return FALSE.
-  bool validateDecimal(String value, {int maxIntegers = 4, int maxDecimals = 6}){
-    //skip default values.
-    if(value == "0" || value == "0.0") return true;
-    double? parsedValue = double.tryParse(value);
-    //validate if the text input actually is a decimal value.
-    if(parsedValue == null) return false;
 
-    List<String> parts = value.split('.');
-    int integers = parts[0].length;
-    int decimals = parts.length > 1? parts[1].length : 0;
-
-    // if(decimals <= 0) return false;
-    if(decimals > maxDecimals) return false;
-    if(integers > maxIntegers) return false;
-
-    return true;
-  }
   @override
   TWSArticleTableEditor? composeEditor(Location set, void Function() closeReinvoke, BuildContext context) {
     
@@ -343,6 +325,7 @@ final class _TableAdapter extends TWSArticleTableAdapter<Location> {
               TWSInputText(
                 label: 'Name',
                 hint: 'Insert a name',
+                maxLength: 30,
                 controller: TextEditingController(
                   text: set.name,
                 ),
@@ -716,6 +699,7 @@ final class _TableAdapter extends TWSArticleTableAdapter<Location> {
                       state.latitudeController.text = set.waypointNavigation?.latitude.toString() ?? "";
                       state.altitudeController.text = set.waypointNavigation?.altitude != null? set.waypointNavigation?.altitude.toString() ?? "" : "";
                     }
+                    
                     return CSMSpacingColumn(
                       spacing: 10,
                       children: <Widget>[
@@ -724,10 +708,10 @@ final class _TableAdapter extends TWSArticleTableAdapter<Location> {
                           hint: "Add longitude cord.",
                           maxLength: 11,
                           keyboardType: TextInputType.number,
-                          showErrorColor: !validateDecimal(set.waypointNavigation?.longitude.toString() ?? ""),
+                          showErrorColor: !(set.waypointNavigation?.longitude.toString() ?? "").evaluateAsDecimal(),
                           controller: state.longitudeController,
                           formatter: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.-]'))
                           ],
                           onChanged: (String text) {
                             set = set.clone(
@@ -745,10 +729,10 @@ final class _TableAdapter extends TWSArticleTableAdapter<Location> {
                           hint: "Add latitude cord.",
                           maxLength: 11,
                           keyboardType: TextInputType.number,
-                          showErrorColor: !validateDecimal(set.waypointNavigation?.latitude.toString() ?? ""),
+                          showErrorColor: !(set.waypointNavigation?.latitude.toString() ?? "").evaluateAsDecimal(),
                           controller: state.latitudeController,
                           formatter: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.-]'))
                           ],
                           onChanged: (String text) {
                             set = set.clone(
@@ -766,10 +750,10 @@ final class _TableAdapter extends TWSArticleTableAdapter<Location> {
                           hint: "Add Altitude cord.",
                           maxLength: 11,
                           keyboardType: TextInputType.number,
-                          showErrorColor: set.waypointNavigation?.altitude != null? !validateDecimal(set.waypointNavigation?.altitude.toString() ?? "") : false,
+                          showErrorColor: set.waypointNavigation?.altitude != null? !(set.waypointNavigation?.altitude.toString() ?? "").evaluateAsDecimal() : false,
                           controller: state.altitudeController,
                           formatter: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.-]'))
                           ],
                           onChanged: (String text) {
                             set = set.clone(
@@ -828,10 +812,10 @@ final class _TableAdapter extends TWSArticleTableAdapter<Location> {
                           hint: "Add longitude cord.",
                           maxLength: 11,
                           keyboardType: TextInputType.number,
-                          showErrorColor: !validateDecimal(set.waypointNavigation?.longitude.toString() ?? "0.0"),
+                          showErrorColor: !(set.waypointNavigation?.longitude.toString() ?? "0.0").evaluateAsDecimal(),
                           controller: state.longitudeController,
                           formatter: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.-]'))
                           ],
                           onChanged: (String text) {
                             set = set.clone(
@@ -849,10 +833,10 @@ final class _TableAdapter extends TWSArticleTableAdapter<Location> {
                           hint: "Add latitude cord.",
                           maxLength: 11,
                           keyboardType: TextInputType.number,
-                          showErrorColor: !validateDecimal(set.waypointNavigation?.latitude.toString() ?? "0.0"),
+                          showErrorColor: !(set.waypointNavigation?.latitude.toString() ?? "0.0").evaluateAsDecimal(),
                           controller: state.latitudeController,
                           formatter: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.-]'))
                           ],
                           onChanged: (String text) {
                             set = set.clone(
@@ -870,10 +854,10 @@ final class _TableAdapter extends TWSArticleTableAdapter<Location> {
                           hint: "Add Altitude cord.",
                           maxLength: 11,
                           keyboardType: TextInputType.number,
-                          showErrorColor: set.waypointNavigation?.altitude != null? !validateDecimal(set.waypointNavigation?.altitude.toString() ?? "") : false,
+                          showErrorColor: set.waypointNavigation?.altitude != null? !(set.waypointNavigation?.altitude.toString() ?? "").evaluateAsDecimal() : false,
                           controller: state.altitudeController,
                           formatter: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.-]'))
                           ],
                           onChanged: (String text) {
                             set = set.clone(

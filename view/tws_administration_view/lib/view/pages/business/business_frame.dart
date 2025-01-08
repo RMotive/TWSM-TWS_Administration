@@ -60,6 +60,16 @@ class BusinessFrame extends StatelessWidget {
       route: TWSARoutes.locationsArticle,
       title: 'Locations',
     ),
+    ArticleOptions(
+      icon: (Color? stateColor) {
+        return Icon(
+          Icons.space_dashboard_sharp,
+          color: stateColor,
+        );
+      },
+      route: TWSARoutes.sectionsArticle,
+      title: 'Sections',
+    ),
   ];
 
   @override
