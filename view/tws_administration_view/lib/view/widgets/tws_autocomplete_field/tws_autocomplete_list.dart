@@ -5,7 +5,8 @@ class _TWSAutocompleteList<T> extends StatelessWidget {
   final List<T> list;
   final CSMColorThemeOptions theme;
   final String Function(T?) displayLabel;
-  final void Function(String label) onTap;
+  final String Function(T?)? suffixLabel;
+  final void Function(String label, T? item) onTap;
   final Color hoverTextColor;
 
   const _TWSAutocompleteList({
@@ -14,7 +15,8 @@ class _TWSAutocompleteList<T> extends StatelessWidget {
     required this.displayLabel,
     required this.theme,
     required this.onTap,
-    required this.hoverTextColor
+    required this.hoverTextColor,
+    this.suffixLabel,
   });
 
   @override
@@ -29,11 +31,11 @@ class _TWSAutocompleteList<T> extends StatelessWidget {
         final String label = displayLabel(currentItem);
         // Build the individual option component.
         return TWSListTile(
-          label: label,
+          label:'$label ${suffixLabel != null? suffixLabel!(currentItem) : ""}',
           onHoverColor: theme.main,
-          onHoverTextColor: hoverTextColor,
-          textColor: theme.hightlightAlt ?? Colors.black,
-          onTap: () => onTap(label)
+          onHoverTextColor: theme.foreAlt!,
+          textColor: theme.foreAlt!,
+          onTap: () => onTap(label, currentItem)
         ); 
       }
     );

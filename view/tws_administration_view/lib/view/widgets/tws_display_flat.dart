@@ -8,6 +8,8 @@ class TWSDisplayFlat extends StatelessWidget {
   final double? width;
   final double? verticalPadding;
   final double? maxHeight;
+  final Color? color;
+  final Color? foreColor;
 
   const TWSDisplayFlat({
     super.key,
@@ -15,13 +17,15 @@ class TWSDisplayFlat extends StatelessWidget {
     this.height,
     this.maxHeight,
     this.verticalPadding,
+    this.color,
+    this.foreColor,
     required this.display,
   });
 
   @override
   Widget build(BuildContext context) {
     CSMColorThemeOptions errorStruct = getTheme<TWSAThemeBase>().primaryCriticalControl;
-    Color baseColor = errorStruct.highlight;
+    Color baseColor = color ?? errorStruct.highlight;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -52,7 +56,7 @@ class TWSDisplayFlat extends StatelessWidget {
                   display,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: errorStruct.fore,
+                    color: foreColor ?? errorStruct.fore,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

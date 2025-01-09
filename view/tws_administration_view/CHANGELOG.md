@@ -34,6 +34,40 @@
     18. Added [Human_Resources] page.
 
         1. Added [Contact] article.
+    
+    19. Migrated TWS widget changes from [GuardView] environment: 
+        - The [TWSAutocompleteField] future mode, now perform a database search to avoid data overflow.
+        - [TWSArticleTableFieldOptions] Width property added.
+        - Now each [TWSArticleTable] column width can be changed using the [TWSArticleTableFieldOptions] width property.
+        - Added a doble tap summit button preventions on [WisperFrame].
+
+    20. Added [Trailer] Article page.
+    21. Added the view table for [Trailer] and [TrailerExternal].
+    22. Added the creation whisper for [Trailers] article.
+    23. Added update feature on table for [Traile] and [TrailerExternal].
+    24. Fixed some state and view bugs for [TWSAutocompleteField] widget.
+    25. Changed [Trucks] article icon.
+    26. Added a [SingleChildScrollView] for content in [TWSConfirmationDialog] widget.
+    27. Added a [suffixLabel] param to [TWSDatepicker] widget to show secundary text.
+    28. Added [TWSCascadeSection] function boolean parameter [onPressed] to return the show button state.
+    29. Changed name properties for [TWSAutocompleteField] to fit property name and functionality:
+        - [isOptionalLabel] -> [suffixLabel].
+        - [suffixLabel] -> [suffixResultLabel].
+    30. Added missing information in [Trucks] & [Trailers] view tables.
+    31. Now the [TWSAutocompleteField] updates the [localList] data when the parameter changes on rebuild.
+    32. Added [color] & [foreColor] parameter in [TWSDisplayFlat].
+    33. Added [TWSCascadeSection] in optionals sets objects in update view to all articles in [Business] page.
+    34. Added [DateTime] extension [fullDateString] to convert a datetime property in a string that contains date and hour.
+    35. Added an optional [TimePicker] dialog in [TWSDatetimePicker] to add the time to the date.
+    36. Added update feature to [Yardlog] view table.
+    37. Removing text gap in [TWSImageViewer] when is not necesary.
+    38. Added [Locations] Article.
+    39. Added [View] table, [Create] & [Update] whispers for [Locations] article.
+    40. Added the following parameters for [TWSInputText]:
+        - [Formatter] Property.
+        - [KeyboardType] Property.
+    41. Extensions files removed and migrated to foundation environment.
+    42. Added [Sections] article.
 
 - Dependencies upgrade:
     1. (-) tws_foundation_client: Deprecated now used tws_foundation_client

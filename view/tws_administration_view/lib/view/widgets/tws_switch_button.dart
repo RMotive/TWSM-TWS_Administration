@@ -74,7 +74,6 @@ class _TWSSwitchButtonState extends State<TWSSwitchButton> {
                   setState(() {
                     _value = change;
                     widget.onChanged(change);
-                    print(_value);
                   });
                 }
               )

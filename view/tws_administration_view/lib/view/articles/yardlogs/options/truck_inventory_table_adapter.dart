@@ -78,11 +78,29 @@ final class _SectionViewAdapter implements TWSAutocompleteAdapter {
   const _SectionViewAdapter();
 
   @override
-  Future<List<SetViewOut<dynamic>>> consume(int page, int range, List<SetViewOrderOptions> orderings) async {
+  Future<List<SetViewOut<dynamic>>> consume(int page, int range, List<SetViewOrderOptions> orderings, String input) async {
     List<SetViewOut<dynamic>> rawViews = <SetViewOut<dynamic>>[];
     String auth = _sessionStorage.session!.token;
 
-    final SetViewOptions<Section> options = SetViewOptions<Section>(false, range, page, null, orderings, <SetViewFilterNodeInterface<Section>>[]);
+     // Search filters;
+    List<SetViewFilterNodeInterface<Section>> filters = <SetViewFilterNodeInterface<Section>>[];
+
+    // -> Sections filter.
+    if (input.trim().isNotEmpty) {
+      // -> filters
+      SetViewPropertyFilter<Section> sectionNameFilter = SetViewPropertyFilter<Section>(0, SetViewFilterEvaluations.contians, 'Name', input);
+      SetViewPropertyFilter<Section> locationNameFilter = SetViewPropertyFilter<Section>(0, SetViewFilterEvaluations.contians, 'LocationNavigation.Name', input);
+      List<SetViewFilterInterface<Section>> searchFilterFilters = <SetViewFilterInterface<Section>>[
+        sectionNameFilter,
+        locationNameFilter,
+      ];
+      // -> adding filters
+      SetViewFilterLinearEvaluation<Section> searchFilterOption = SetViewFilterLinearEvaluation<Section>(2, SetViewFilterEvaluationOperators.or, searchFilterFilters);
+      filters.add(searchFilterOption);
+    }
+
+    final SetViewOptions<Section> options = SetViewOptions<Section>(false, range, page, null, orderings, filters);
+
     final MainResolver<SetViewOut<Section>> resolver = await Sources.foundationSource.sections.view(options, auth);
     final SetViewOut<Section> view = await resolver.act((Map<String, dynamic> json) => SetViewOut<Section>.des(json, Section.des)).catchError(
       (Object x, StackTrace s) {

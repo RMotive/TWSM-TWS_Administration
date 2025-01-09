@@ -7,14 +7,17 @@ class TWSCascadeSection extends StatefulWidget {
   final String title;
   final Widget mainControl;
   final Widget content;
-  final void Function()? onPressed;
+  final void Function(bool isShowing)? onPressed;
   final String? tooltip;
   final EdgeInsets padding;
+  // Aligment for main controls row.
+  final MainAxisAlignment mainAxisAlignment;
   const TWSCascadeSection({
     super.key,
     this.onPressed,
     this.tooltip,
     this.padding = const EdgeInsets.symmetric(vertical: 10),
+    this.mainAxisAlignment =  MainAxisAlignment.spaceBetween,
     required this.title,
     required this.mainControl,
     required this.content
@@ -69,7 +72,7 @@ class _TWSCascadeSectionState extends State<TWSCascadeSection> {
         children: <Widget>[
           CSMSpacingRow(
             spacing: 10,
-            mainAlignment: MainAxisAlignment.spaceBetween,
+            mainAlignment: widget.mainAxisAlignment,
             children: <Widget>[
               widget.mainControl,
               IconButton(
@@ -84,10 +87,10 @@ class _TWSCascadeSectionState extends State<TWSCascadeSection> {
                 color: Colors.white,
                 iconSize: 32,
                 onPressed: () {
-                  widget.onPressed;
                   showCascade();
+                  if(widget.onPressed != null) widget.onPressed!(show);
                 },
-                icon: const Icon(Icons.add,)),
+                icon: const Icon(Icons.add,),),
             ],
           ),
           Visibility(

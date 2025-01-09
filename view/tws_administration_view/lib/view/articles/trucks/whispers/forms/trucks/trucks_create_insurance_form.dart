@@ -14,7 +14,7 @@ class _TruckCreateInsurance extends StatelessWidget {
     return TWSSection(
       isOptional: true,
       padding: const EdgeInsets.symmetric(vertical: 10),
-      title: "Insurance", 
+      title: "Insurance (optional)", 
       content: CSMSpacingColumn(
         spacing: 10,
         children: <Widget>[
@@ -30,7 +30,6 @@ class _TruckCreateInsurance extends StatelessWidget {
                   controller: TextEditingController(text: item.insuranceNavigation?.policy),
                   onChanged: (String text) {
                     Truck model = itemState!.model as Truck;
-                    print(model.insuranceNavigation?.encode());
                     itemState!.updateModelRedrawing(
                       model.clone(
                         insuranceNavigation: model.insuranceNavigation?.clone(policy: text) 

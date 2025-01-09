@@ -1,8 +1,8 @@
 
 import 'package:csm_view/csm_view.dart';
 import 'package:flutter/material.dart';
-import 'package:tws_administration_view/core/extension/datetime.dart';
 import 'package:tws_administration_view/core/theme/bases/twsa_theme_base.dart';
+import 'package:tws_foundation_client/tws_foundation_client.dart';
 
 
 /// [TWSDatepicker] Custom component for TWS Environment.
@@ -28,12 +28,17 @@ class TWSDatepicker extends StatefulWidget {
   final TextEditingController? controller;
   /// Defines if the user can interact with the widget.
   final bool isEnabled;
-  ///
+  /// show the prefix icon or not.
   final bool enablePrefix;
   /// Callback that return the selected options in the datepicker dialog.
   final void Function(String text)? onChanged;
   /// Validator for the text input.
   final String? Function(String? text)? validator;
+  /// Suffix text at the end of [label] text.
+  final String? suffixLabel;
+  /// Add an aditional dialog to set the time in the date picked.
+  final bool addTimePicker;
+  
 
   const TWSDatepicker({super.key,
     required this.firstDate,
@@ -44,11 +49,13 @@ class TWSDatepicker extends StatefulWidget {
     this.label,
     this.hintText,
     this.focusNode,
-      this.enablePrefix = true,
+    this.enablePrefix = true,
     this.isEnabled = true,
     this.controller,
     this.onChanged,
-    this.validator
+    this.validator,
+    this.suffixLabel,
+    this.addTimePicker = false,
   });
   
   @override
@@ -119,18 +126,32 @@ class _TWSDatepickerState extends State<TWSDatepicker> {
             cursorOpacityAnimates: true,
             cursorWidth: 3,
             cursorColor: colorStruct.foreAlt,
+            onTap: () => _showDatePicker(),
             style: TextStyle(
               color: colorStruct.foreAlt?.withOpacity(.7),
             ),
-            onTap: () => _showDatePicker(),
             decoration: InputDecoration(
               isDense: true,
               errorText: _error,
               errorMaxLines: 1,
-              suffixIcon: const Icon(
-                Icons.calendar_month,
-              ),
               suffixIconColor: colorStruct.main,
+              hintText: widget.hintText,
+              labelText: widget.suffixLabel == null? widget.label : null,
+              label: widget.suffixLabel != null
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text(widget.label ?? ""),
+                        Text(
+                          widget.suffixLabel!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colorStruct.foreAlt?.withOpacity(.5),
+                          ),
+                        ),
+                      ],
+                    )
+                  : null,
               prefixIcon: (widget.enablePrefix && ctrl.text.isNotEmpty)
                   ? IconButton(
                       tooltip: "Delete selection",
@@ -148,8 +169,9 @@ class _TWSDatepickerState extends State<TWSDatepicker> {
                       },
                     )
                   : null,
-              labelText: widget.label,
-              hintText: widget.hintText,
+              suffixIcon: const Icon(
+                Icons.calendar_month,
+              ),
               labelStyle: TextStyle(
                 color: colorStruct.foreAlt,
               ),
@@ -191,39 +213,62 @@ class _TWSDatepickerState extends State<TWSDatepicker> {
       )
     );
   }
+  Theme _themeDesigner(BuildContext context, Widget? child){
+    return Theme(
+      data: Theme.of(context).copyWith(
+        colorScheme: ColorScheme.dark(
+          surface: colorStruct.main, //Background color
+          primary: colorStruct.fore, // header background color
+          onPrimary: colorStruct.foreAlt ?? Colors.white, // header text color
+          onSurface: colorStruct.foreAlt ?? Colors.white // body text color
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: colorStruct.foreAlt ?? Colors.white // button text color
+          )
+        )
+      ),
+      child: child!
+    );
+  }
+
   /// [_showDatePicker] Method that build the showpicker dialog.
   Future<void> _showDatePicker() async {
+    /// stores the time selected when [addTimepicker] property is true.
+    TimeOfDay? time;
+
     DateTime? date = await showDatePicker(
       context: context,
       initialDatePickerMode: DatePickerMode.year,
       initialDate: widget.initialDate,
       firstDate: widget.firstDate, 
       lastDate: widget.lastDate,
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.dark(
-              surface: colorStruct.main, //Background color
-              primary: colorStruct.fore, // header background color
-              onPrimary: colorStruct.foreAlt ?? Colors.white, // header text color
-              onSurface: colorStruct.foreAlt ?? Colors.white // body text color
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: colorStruct.foreAlt ?? Colors.white // button text color
-              )
-            )
-          ),
-          child: child!
-        );
-      }
+      builder: (BuildContext context, Widget? child) => _themeDesigner(context, child),
     );
+
+    if(widget.addTimePicker && mounted){
+      time = await showTimePicker(
+        context: context, 
+        initialEntryMode: TimePickerEntryMode.inputOnly,
+        initialTime: TimeOfDay.fromDateTime(widget.initialDate ?? DateTime.now()),
+        builder: (BuildContext context, Widget? child) => _themeDesigner(context, child),
+      );
+    }
     if(date != null) {
+      date = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time?.hour ?? date.hour,
+        time?.minute ?? date.minute,
+        date.second,
+      );
+
       String? errorBuilt = widget.validator?.call(date.dateOnlyString);
       if (errorBuilt == null) {
         setState(() {
           _error = null;
-          ctrl.text = date.dateOnlyString;
+          ctrl.text = time != null? date!.fullDateString : date!.dateOnlyString;
           if (widget.onChanged != null) widget.onChanged!(ctrl.text);
         });
       } else {

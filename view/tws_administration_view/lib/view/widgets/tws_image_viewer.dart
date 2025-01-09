@@ -79,8 +79,9 @@ class TWSImageViewer extends StatelessWidget {
       crossAlignment: CrossAxisAlignment.start,
       spacing: 8,
       children: <Widget>[
+        if(title != null)
         Text(
-          title ?? "",
+          title!,
           textAlign: align,
           style: style
         ),

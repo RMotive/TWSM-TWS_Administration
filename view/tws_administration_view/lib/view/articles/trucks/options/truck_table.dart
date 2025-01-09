@@ -23,68 +23,8 @@ class _TruckTable extends StatelessWidget {
               item.truckCommonNavigation?.economic ?? '---',
         ),
         TWSArticleTableFieldOptions<Truck>(
-          'VIN',
-          (Truck item, int index, BuildContext ctx) => item.vin,
-        ),
-        TWSArticleTableFieldOptions<Truck>(
-          'Carrier',
-          (Truck item, int index, BuildContext ctx) =>
-              item.carrierNavigation?.name ?? '---',
-        ),
-        TWSArticleTableFieldOptions<Truck>(
-          'Manufacturer',
-          (Truck item, int index, BuildContext ctx) =>
-              item.vehiculeModelNavigation?.manufacturerNavigation?.name ?? '---',
-        ),
-        TWSArticleTableFieldOptions<Truck>(
-          'Motor',
-          (Truck item, int index, BuildContext ctx) => item.motor ?? '---',
-          true,
-        ),
-        TWSArticleTableFieldOptions<Truck>(
-          'SCT Number',
-          (Truck item, int index, BuildContext ctx) =>
-              item.sctNavigation?.number ?? '---',
-          true,
-        ),
-        TWSArticleTableFieldOptions<Truck>(
-          'USDOT number',
-          (Truck item, int index, BuildContext ctx) =>
-              item.carrierNavigation?.usdotNavigation?.scac ?? '---',
-        ),
-        TWSArticleTableFieldOptions<Truck>(
-          'Trimestral Maintenance',
-          (Truck item, int index, BuildContext ctx) =>
-              item.maintenanceNavigation?.trimestral.toString() ?? '---',
-          true,
-        ),
-        TWSArticleTableFieldOptions<Truck>(
-          'Anual Maintenance',
-          (Truck item, int index, BuildContext ctx) =>
-              item.maintenanceNavigation?.anual.toString() ?? '---',
-          true,
-        ),
-        TWSArticleTableFieldOptions<Truck>(
-          'Insurance',
-          (Truck item, int index, BuildContext ctx) =>
-              item.insuranceNavigation?.policy ?? '---',
-          true,
-        ),
-        TWSArticleTableFieldOptions<Truck>(
           'Plates',
           (Truck item, int index, BuildContext ctx) => adapter.getPlates(item),
-          true,
-        ),
-        TWSArticleTableFieldOptions<Truck>(
-          'Situation',
-          (Truck item, int index, BuildContext ctx) =>
-              item.truckCommonNavigation?.situationNavigation?.name ?? '---',
-          true,
-        ),
-        TWSArticleTableFieldOptions<Truck>(
-          'Location',
-          (Truck item, int index, BuildContext ctx) =>
-              item.truckCommonNavigation?.locationNavigation?.name ?? '---',
           true,
         ),
       ],

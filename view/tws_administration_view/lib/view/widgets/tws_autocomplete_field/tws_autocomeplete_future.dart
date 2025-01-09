@@ -3,36 +3,51 @@ part of 'tws_autocomplete_field.dart';
 class _TWSAutocompleteFuture<T> extends StatelessWidget {
   final Future<List<SetViewOut<dynamic>>> Function() consume;
   final ScrollController controller;
-  final List<T> suggestions;
   final double tileHeigth;
   final CSMColorThemeOptions theme;
   final String Function(T?) displayLabel;
-  final void Function(String label) onTap;
-  final List<T> Function(List<SetViewOut<dynamic>> data) onFirstBuild;
+  final String Function(T?)? suffixLabel;
+  final void Function(String label, T? item) onTap;
+  final List<T> Function(List<SetViewOut<dynamic>> data) onFetch;
   final Color loadingColor;
   final Color hoverTextColor;
-  final bool firstBuild;
+  final CSMConsumerAgent agent;
 
   const _TWSAutocompleteFuture({
     required this.consume,
     required this.controller,
-    required this.suggestions,
     required this.displayLabel,
     required this.theme,
     required this.onTap,
     required this.loadingColor,
     required this.hoverTextColor,
-    required this.onFirstBuild,
+    required this.onFetch,
     required this.tileHeigth,
-    required this.firstBuild
+    required this.agent,
+    this.suffixLabel
   });
+
+
+  List<T> getSets(List<SetViewOut<dynamic>> rawData){
+    List<T> data = <T>[];
+    for (SetViewOut<dynamic> view in rawData) {
+      data = <T>[...data, ...view.sets];
+    }
+    return data;
+  }
 
   @override
   Widget build(BuildContext context) {
     return CSMConsumer<List<SetViewOut<dynamic>>>(
       consume: consume,
-        emptyCheck: (List<SetViewOut<dynamic>> data) {
-        return false;
+      agent: agent,
+      emptyCheck: (List<SetViewOut<dynamic>> data) {
+        onFetch(data); 
+        int cont = 0;
+        for(SetViewOut<dynamic> view in data){
+          cont += view.sets.length;
+        }
+        return cont == 0? true: false;
       },
       loadingBuilder: (_) {
         return Padding(
@@ -44,31 +59,29 @@ class _TWSAutocompleteFuture<T> extends StatelessWidget {
           ),
         );
       },
-        errorBuilder: (BuildContext ctx, Object? error, List<SetViewOut<dynamic>>? data) {
-        return const Padding(
-          padding: EdgeInsets.all(10),
+      errorBuilder: (BuildContext ctx, Object? error, List<SetViewOut<dynamic>>? data) {
+        return Padding(
+          padding: const EdgeInsets.all(10),
           child: TWSDisplayFlat(
-            display: 'Error loading data',
+            display: error == null? 'No hay resultados' : "Problema al cargar",
           ),
         );
       },
-        successBuilder: (BuildContext ctx, List<SetViewOut<dynamic>> rawData) {  
-        return suggestions.isNotEmpty || firstBuild? Scrollbar(
+      successBuilder: (BuildContext ctx, List<SetViewOut<dynamic>> rawData) {
+        onFetch(rawData); 
+        return Scrollbar(
           trackVisibility: true,
           thumbVisibility: true,
           controller: controller,
           child: _TWSAutocompleteList<T>(
             controller: controller,
-            list: firstBuild? onFirstBuild(rawData) : suggestions,
+            list: getSets(rawData) ,
+            suffixLabel: suffixLabel,
             displayLabel: displayLabel,
             theme: theme,
             hoverTextColor: hoverTextColor,
             onTap: onTap,
           )
-        ) 
-        :_TWSAutocompleteNotfound(
-          height: tileHeigth, 
-          color: loadingColor
         );
       }
     );

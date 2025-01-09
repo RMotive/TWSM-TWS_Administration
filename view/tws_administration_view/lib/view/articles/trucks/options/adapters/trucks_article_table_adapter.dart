@@ -11,9 +11,26 @@ final class _VehiculeModelViewAdapter implements TWSAutocompleteAdapter{
   const _VehiculeModelViewAdapter();
 
   @override
-  Future<List<SetViewOut<VehiculeModel>>> consume(int page, int range, List<SetViewOrderOptions> orderings) async {
+  Future<List<SetViewOut<VehiculeModel>>> consume(int page, int range, List<SetViewOrderOptions> orderings, String input) async {
     String auth = _sessionStorage.session!.token;
-    final SetViewOptions<VehiculeModel> options = SetViewOptions<VehiculeModel>(false,10, page, null, orderings, <SetViewFilterNodeInterface<VehiculeModel>>[]);
+
+    // Search filters;
+    List<SetViewFilterNodeInterface<VehiculeModel>> filters = <SetViewFilterNodeInterface<VehiculeModel>>[];
+
+    // -> Models filter.
+    if (input.trim().isNotEmpty) {
+      // -> filters
+      SetViewPropertyFilter<VehiculeModel> modelNameFilter = SetViewPropertyFilter<VehiculeModel>(0, SetViewFilterEvaluations.contians, 'Name', input);
+      SetViewPropertyFilter<VehiculeModel> manufacturerNameFilter = SetViewPropertyFilter<VehiculeModel>(0, SetViewFilterEvaluations.contians, 'manufacturerNavigation.Name', input);
+      List<SetViewFilterInterface<VehiculeModel>> searchFilterFilters = <SetViewFilterInterface<VehiculeModel>>[
+        modelNameFilter,
+        manufacturerNameFilter,
+      ];
+      // -> adding filters
+      SetViewFilterLinearEvaluation<VehiculeModel> searchFilterOption = SetViewFilterLinearEvaluation<VehiculeModel>(2, SetViewFilterEvaluationOperators.or, searchFilterFilters);
+      filters.add(searchFilterOption);
+    }
+    final SetViewOptions<VehiculeModel> options = SetViewOptions<VehiculeModel>(false, range, page, null, orderings, filters);
     final MainResolver<SetViewOut<VehiculeModel>> resolver = await Sources.foundationSource.vehiculesModels.view(options, auth);
     final SetViewOut<VehiculeModel> view = await resolver.act((JObject json) => SetViewOut<VehiculeModel>.des(json, VehiculeModel.des)).catchError(
           (Object x, StackTrace s) {
@@ -29,7 +46,7 @@ final class _SituationsViewAdapter implements TWSAutocompleteAdapter{
   const _SituationsViewAdapter();
   
   @override
-  Future<List<SetViewOut<Situation>>> consume(int page, int range, List<SetViewOrderOptions> orderings) async {
+  Future<List<SetViewOut<Situation>>> consume(int page, int range, List<SetViewOrderOptions> orderings, String input) async {
     String auth = _sessionStorage.session!.token;
     final SetViewOptions<Situation> options =  SetViewOptions<Situation>(false, range, page, null, orderings, <SetViewFilterNodeInterface<Situation>>[]);
     final MainResolver<SetViewOut<Situation>> resolver = await Sources.foundationSource.situations.view(options, auth);
@@ -47,9 +64,18 @@ final class _CarriersViewAdapter implements TWSAutocompleteAdapter {
   const _CarriersViewAdapter();
   
   @override
-  Future<List<SetViewOut<Carrier>>> consume(int page, int range, List<SetViewOrderOptions> orderings) async {
+  Future<List<SetViewOut<Carrier>>> consume(int page, int range, List<SetViewOrderOptions> orderings, String input) async {
     String auth = _sessionStorage.session!.token;
-    final SetViewOptions<Carrier> options =  SetViewOptions<Carrier>(false, 100, page, null, orderings, <SetViewFilterNodeInterface<Carrier>>[]);
+    // Search filters;
+    List<SetViewFilterNodeInterface<Carrier>> filters = <SetViewFilterNodeInterface<Carrier>>[];
+    // -> Carriers filter.
+    if (input.trim().isNotEmpty) {
+      // -> filters
+      SetViewPropertyFilter<Carrier> carrierNameFilter = SetViewPropertyFilter<Carrier>(0, SetViewFilterEvaluations.contians, 'Name', input);
+      // -> adding filters
+      filters.add(carrierNameFilter);
+    }
+    final SetViewOptions<Carrier> options =  SetViewOptions<Carrier>(false, range, page, null, orderings, filters);
     final MainResolver<SetViewOut<Carrier>> resolver = await Sources.foundationSource.carriers.view(options, auth);
     final SetViewOut<Carrier> view = await resolver.act((JObject json) => SetViewOut<Carrier>.des(json, Carrier.des)).catchError(
           (Object x, StackTrace s) {
@@ -110,16 +136,148 @@ final class _TableAdapter extends TWSArticleTableAdapter<Truck> {
               statement: Text.rich(
                 textAlign: TextAlign.center,
                 TextSpan(
-                    text: 'Are you sure you want to update truck ',
-                    children: <InlineSpan>[
-                      TextSpan(
-                        text:
-                            '(${set.truckCommonNavigation?.economic ?? 'Empty Economic'})?',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w800,
-                        ),
+                  text: 'Are you sure you want to update a truck?',
+                  children: <InlineSpan>[
+                    const TextSpan(
+                      text: '\n\u2022 Economic:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
                       ),
-                    ]),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n${set.truckCommonNavigation?.economic ?? "---"}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\u2022 Carrier:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n${set.carrierNavigation?.name ?? "---"}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\u2022 Manufacturer:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n${set.vehiculeModelNavigation?.manufacturerNavigation?.name ?? "---"}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\u2022 SCT:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n${set.sctNavigation?.number ?? "---"}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\u2022 USDOT:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n scac - ${set.carrierNavigation?.usdotNavigation?.scac ?? "---"}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\u2022 Trim. maintenance:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n ${set.maintenanceNavigation?.trimestral.dateOnlyString ?? "---"}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\u2022 Anual. maintenance:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n ${set.maintenanceNavigation?.anual.dateOnlyString ?? "---"}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\u2022 Situation',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n ${set.truckCommonNavigation?.situationNavigation?.name ?? "---"}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\n\u2022 Plates \n',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    for(int cont = 0; cont < set.plates.length; cont++)
+                    TextSpan(
+                      text: '\n Plate ${cont+1}: ${set.plates[cont].identifier} - ${set.plates[cont].country}',
+                    ),
+                  ],
+                ),
               ),
               onAccept: () async {
                 List<CSMSetValidationResult> evaluation = set.evaluate();
@@ -221,7 +379,10 @@ final class _TableAdapter extends TWSArticleTableAdapter<Truck> {
                 initialValue: set.carrierNavigation,
                 onChanged: (Carrier? selectedItem) {
                   set.carrierNavigation = null;
-                  set = set.clone(carrier: selectedItem?.id ?? 0);
+                  set = set.clone(
+                    carrier: selectedItem?.id ?? 0,
+                    carrierNavigation: selectedItem,
+                  );
                 },
                 displayValue: (Carrier? set) {
                   return set?.name ?? 'error';
@@ -235,7 +396,10 @@ final class _TableAdapter extends TWSArticleTableAdapter<Truck> {
                 initialValue: set.vehiculeModelNavigation,
                 onChanged: (VehiculeModel? selectedItem) {
                   set.vehiculeModelNavigation = null;
-                  set = set.clone(model: selectedItem?.id ?? 0);
+                  set = set.clone(
+                    model: selectedItem?.id ?? 0,
+                    vehiculeModelNavigation: selectedItem,
+                  );
                 },
                 displayValue: (VehiculeModel? set) {
                   return set?.name ?? 'error';
@@ -250,8 +414,11 @@ final class _TableAdapter extends TWSArticleTableAdapter<Truck> {
                 onChanged: (Situation? selectedItem) {
                   set.truckCommonNavigation!.situationNavigation = null;
                   set = set.clone(
-                      truckCommonNavigation: set.truckCommonNavigation
-                          ?.clone(situation: selectedItem?.id ?? 0));
+                    truckCommonNavigation: set.truckCommonNavigation?.clone(
+                      situation: selectedItem?.id ?? 0,
+                      situationNavigation: selectedItem,
+                    ),
+                  );
                 },
                 displayValue: (Situation? set) {
                   return set?.name ?? 'error';
@@ -296,7 +463,6 @@ final class _TableAdapter extends TWSArticleTableAdapter<Truck> {
                       onChanged: (String? selection) {
                         set.plates[index] = set.plates[index].clone(
                             country: selection ?? "", state: "", truck: set.id);
-                        print(set.plates[index].state);
                         _platesFormsState();
                       },
                     ),
@@ -345,6 +511,8 @@ final class _TableAdapter extends TWSArticleTableAdapter<Truck> {
                 },
               ),
             ),
+
+            if(set.sctNavigation != null)
             TWSSection(
               title: "SCT",
               content: CSMSpacingColumn(spacing: 10, children: <Widget>[
@@ -385,11 +553,93 @@ final class _TableAdapter extends TWSArticleTableAdapter<Truck> {
                     set = set.clone(
                         sctNavigation:
                             set.sctNavigation?.clone(configuration: text) ??
-                                SCT.a().clone(configuration: text));
-                  },
+                                SCT.a().clone(configuration: text),
+                      );
+                    },
                 ),
               ]),
             ),
+
+            if(set.sctNavigation == null) 
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: TWSCascadeSection(
+                title: "SCT", 
+                padding: EdgeInsets.zero,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                onPressed: (bool isShowing) {
+                  //Creates a new Maintenance object.
+                  if(isShowing){
+                    set = set.clone(
+                      maintenanceNavigation: Maintenance.a(),
+                    );
+                    return;
+                  }
+              
+                  //Removing the Maintenance object.
+                  set = set.clone(
+                    maintenance: 0,
+                  );
+                },
+                mainControl: const Expanded(
+                  child: TWSDisplayFlat(
+                    display: "Add an SCT",
+                    color: TWSAColors.oceanBlue,
+                    foreColor: TWSAColors.warmWhite,
+                  ),
+                ),
+                content: CSMSpacingColumn(
+                  spacing: 10,
+                  children: <Widget>[
+                    TWSInputText(
+                      label: "Type",
+                      hint: "enter the SCT type",
+                      maxLength: 6,
+                      isStrictLength: true,
+                      controller:
+                          TextEditingController(text: set.sctNavigation?.type),
+                      onChanged: (String text) {
+                        set = set.clone(
+                            sctNavigation: set.sctNavigation?.clone(type: text) ??
+                                SCT.a().clone(type: text));
+                      },
+                    ),
+                    TWSInputText(
+                      label: "Number",
+                      hint: "enter the SCT number",
+                      maxLength: 25,
+                      isStrictLength: true,
+                      controller:
+                          TextEditingController(text: set.sctNavigation?.number),
+                      onChanged: (String text) {
+                        set = set.clone(
+                            sctNavigation: set.sctNavigation?.clone(number: text) ??
+                                SCT.a().clone(number: text),
+                        );
+                      },
+                    ),
+                    TWSInputText(
+                      label: "Configuration",
+                      hint: "enter the SCT configuration",
+                      maxLength: 10,
+                      isStrictLength: false,
+                      controller: TextEditingController(
+                        text: set.sctNavigation?.configuration,
+                      ),
+                      onChanged: (String text) {
+                        set = set.clone(
+                          sctNavigation:
+                              set.sctNavigation?.clone(configuration: text) ??
+                                  SCT.a().clone(configuration: text),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            if(set.maintenanceNavigation != null)
             TWSSection(
               title: "Maintenance",
               content: CSMSpacingColumn(
@@ -424,6 +674,70 @@ final class _TableAdapter extends TWSArticleTableAdapter<Truck> {
                 ],
               ),
             ),
+
+            if(set.maintenanceNavigation == null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: TWSCascadeSection(
+                title: "Maintenance", 
+                padding: EdgeInsets.zero,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                onPressed: (bool isShowing) {
+                  //Creates a new Maintenance object.
+                  if(isShowing){
+                    set = set.clone(
+                      maintenanceNavigation: Maintenance.a(),
+                    );
+                    return;
+                  }
+              
+                  //Removing the Maintenance object.
+                  set = set.clone(
+                    maintenance: 0,
+                  );
+                },
+                mainControl: const Expanded(
+                  child: TWSDisplayFlat(
+                    display: "Add Maintenance",
+                    color: TWSAColors.oceanBlue,
+                    foreColor: TWSAColors.warmWhite,
+                  ),
+                ),
+                content: CSMSpacingColumn(
+                  spacing: 10,
+                  children: <Widget>[
+                    TWSDatepicker(
+                      width: double.maxFinite,
+                      firstDate: DateTime(1999),
+                      lastDate: DateTime(2040),
+                      label: "Trimestral",
+                      controller: TextEditingController(text: set.maintenanceNavigation?.trimestral.dateOnlyString),
+                      onChanged: (String text) {
+                        set = set.clone(
+                          maintenanceNavigation: set.maintenanceNavigation?.clone(trimestral: DateTime.tryParse(text) ?? DateTime(0)) 
+                          ?? Maintenance.a().clone(trimestral:DateTime.tryParse(text) ?? DateTime(0))
+                        );
+                      },
+                    ),
+                    TWSDatepicker(
+                      width: double.maxFinite,
+                      firstDate: DateTime(1999),
+                      lastDate: DateTime(2040),
+                      label: "Anual",
+                      controller: TextEditingController(text: set.maintenanceNavigation?.anual.dateOnlyString),
+                      onChanged: (String text) {
+                        set = set.clone(
+                            maintenanceNavigation: set.maintenanceNavigation?.clone(anual: DateTime.tryParse(text) ??DateTime(0)) 
+                            ?? Maintenance.a().clone( anual: DateTime.tryParse(text) ?? DateTime(0))
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            if(set.insuranceNavigation != null)
             TWSSection(
               title: "Insurance",
               content: CSMSpacingColumn(spacing: 10, children: <Widget>[
@@ -465,9 +779,86 @@ final class _TableAdapter extends TWSArticleTableAdapter<Truck> {
                     set = set.clone(insuranceNavigation: set.insuranceNavigation?.clone(country: selection ?? "") 
                     ?? Insurance.a().clone(country: selection ?? ""));
                   },
-                )
+                ),
               ]),
             ),
+            
+            if(set.insuranceNavigation == null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: TWSCascadeSection(
+                title: "Insurance", 
+                padding: EdgeInsets.zero,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                onPressed: (bool isShowing) {
+                  //Creates a new Insurance object.
+                  if(isShowing){
+                    set = set.clone(
+                      insuranceNavigation: Insurance.a(),
+                    );
+                    return;
+                  }
+              
+                  //Removing the Insurance object.
+                  set = set.clone(
+                    insurance: 0,
+                  );
+                },
+                mainControl: const Expanded(
+                  child: TWSDisplayFlat(
+                    display: "Add Insurance",
+                    color: TWSAColors.oceanBlue,
+                    foreColor: TWSAColors.warmWhite,
+                  ),
+                ),
+                content: CSMSpacingColumn(
+                  spacing: 10,
+                  children: <Widget>[
+                    TWSInputText(
+                      label: "Policy",
+                      hint: "enter the Insurance policy",
+                      maxLength: 20,
+                      isStrictLength: true,
+                      controller: TextEditingController(
+                        text: set.insuranceNavigation?.policy,
+                      ),
+                      onChanged: (String text) {
+                        set = set.clone(
+                          insuranceNavigation: set.insuranceNavigation?.clone(policy: text) 
+                          ?? Insurance.a().clone(policy: text)
+                        );
+                      },
+                    ),
+                    TWSDatepicker(
+                      width: double.maxFinite,
+                      firstDate: DateTime(1999),
+                      lastDate: DateTime(2040),
+                      label: "Expiration",
+                      controller: TextEditingController(
+                          text: set.insuranceNavigation?.expiration.dateOnlyString),
+                      onChanged: (String text) {
+                        set = set.clone(
+                          insuranceNavigation: set.insuranceNavigation?.clone(expiration: DateTime.tryParse(text)) 
+                          ?? Insurance.a().clone(expiration: DateTime.tryParse(text))
+                        );
+                      },
+                    ),
+                    TWSAutoCompleteField<String>(
+                      label: "Country",
+                      width: double.maxFinite,
+                      localList: TWSAMessages.kCountryList,
+                      initialValue: set.insuranceNavigation?.country,
+                      displayValue: (String? value) => value ?? "error",
+                      onChanged: (String? selection) {
+                        set = set.clone(insuranceNavigation: set.insuranceNavigation?.clone(country: selection ?? "") 
+                        ?? Insurance.a().clone(country: selection ?? ""));
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
           ]),
         ),
       ),
@@ -522,6 +913,11 @@ final class _TableAdapter extends TWSArticleTableAdapter<Truck> {
             label: 'Situation',
             value:
                 set.truckCommonNavigation?.situationNavigation?.name ?? '---',
+          ),
+          TWSPropertyViewer(
+            label: 'Insurance',
+            value:
+                set.insuranceNavigation?.policy ?? '---',
           ),
           TWSPropertyViewer(
             label: 'Location',

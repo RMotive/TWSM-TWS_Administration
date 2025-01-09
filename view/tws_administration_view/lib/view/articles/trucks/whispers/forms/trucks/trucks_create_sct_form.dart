@@ -14,7 +14,7 @@ class _TruckCreateSCT extends StatelessWidget {
     return TWSSection(
       isOptional: true,
       padding: const EdgeInsets.symmetric(vertical: 10),
-      title: "SCT",
+      title: "SCT (optional)",
       content: CSMSpacingColumn(spacing: 10, children: <Widget>[
         CSMSpacingRow(spacing: 10, children: <Widget>[
           Expanded(

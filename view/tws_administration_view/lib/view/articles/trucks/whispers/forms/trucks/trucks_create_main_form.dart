@@ -57,21 +57,26 @@ class _TruckCreateMainForm extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: TWSAutoCompleteField<Carrier>(
-                label: "Select a Carrier",
-                hint: "Select a carrier",
-                isOptional: true,
-                adapter: const _CarriersViewAdapter(),
-                initialValue: item.carrierNavigation,
-                onChanged: (Carrier? selectedItem) {
-                  Truck model = itemState!.model as Truck;
-                  itemState!.updateModelRedrawing(model.clone(
-                    carrier: selectedItem?.id ?? 0,
-                    carrierNavigation: selectedItem,
-                  ));
-                },
-                displayValue: (Carrier? set) {
-                  return set?.name ?? 'Not valid';
-                }),
+              label: "Select a Carrier",
+              hint: "Select a carrier",
+              isOptional: true,
+              hasKeyValue: (Carrier? set) {
+                if (set?.id != null) return true;
+                return false;
+              },
+              adapter: const _CarriersViewAdapter(),
+              initialValue: item.carrierNavigation,
+              onChanged: (Carrier? selectedItem) {
+                Truck model = itemState!.model as Truck;
+                itemState!.updateModelRedrawing(model.clone(
+                  carrier: selectedItem?.id ?? 0,
+                  carrierNavigation: selectedItem,
+                ));
+              },
+              displayValue: (Carrier? set) {
+                return set?.name ?? 'Not valid';
+              },
+            ),
           ),
           Expanded(
             child: TWSInputText(

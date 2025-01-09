@@ -30,6 +30,10 @@ class _TruckCreateManufacturer extends StatelessWidget {
               isOptional: true,
               initialValue: item.vehiculeModelNavigation,
               adapter: const _VehiculeModelViewAdapter(),
+              hasKeyValue: (VehiculeModel? set) {
+                if(set?.id != null) return set!.id > 0;
+                return false;
+              },
               onChanged: (VehiculeModel? selectedItem){
                 Truck model = itemState!.model as Truck;
                 itemState!.updateModelRedrawing(
@@ -86,7 +90,7 @@ class _TruckCreateManufacturer extends StatelessWidget {
                   Expanded(
                     child: TWSInputText(
                       label: 'Model',
-                      maxLength: 30,
+                      maxLength: 32,
                       isEnabled: isEnable,
                       controller: TextEditingController(text: item.vehiculeModelNavigation?.name),
                       onChanged: (String text) {

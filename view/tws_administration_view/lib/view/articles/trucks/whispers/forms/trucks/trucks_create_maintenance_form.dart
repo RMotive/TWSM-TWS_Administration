@@ -14,7 +14,7 @@ class _TruckCreateMaintenance extends StatelessWidget {
     return TWSSection(
       isOptional: true,
       padding: const EdgeInsets.symmetric(vertical: 10),
-      title: "Maintenance",
+      title: "Maintenance (optional)",
       content: CSMSpacingColumn(spacing: 10, children: <Widget>[
         CSMSpacingRow(spacing: 10, children: <Widget>[
           Expanded(
@@ -33,7 +33,6 @@ class _TruckCreateMaintenance extends StatelessWidget {
                   ),
                 );
                 model = itemState!.model as Truck;
-                print(model.maintenanceNavigation?.encode());
               },
               isEnabled: enable,
             ),
@@ -54,7 +53,6 @@ class _TruckCreateMaintenance extends StatelessWidget {
                   ),
                 );
                 model = itemState!.model as Truck;
-                print(model.maintenanceNavigation?.encode());
               },
               isEnabled: enable,
             ),

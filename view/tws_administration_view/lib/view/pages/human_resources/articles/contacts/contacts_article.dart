@@ -20,7 +20,7 @@ final class ContactsArticle extends CSMPageBase {
   @override
   Widget compose(BuildContext ctx, Size window) {
     final TWSArticleTableAgent tableAgent = TWSArticleTableAgent();
-
+    
     return HumanResourcesFrame(
       currentRoute: TWSARoutes.contactsArticle,
       actionsOptions: ActionRibbonOptions(

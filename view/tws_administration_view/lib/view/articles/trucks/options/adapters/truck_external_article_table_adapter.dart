@@ -36,15 +36,89 @@ final class _ExternalTableAdapter extends TWSArticleTableAdapter<TruckExternal> 
               statement: Text.rich(
                 textAlign: TextAlign.center,
                 TextSpan(
-                  text: 'Are you sure you want to update truck ',
+                  text: 'Are you sure you want to update an external truck?',
                   children: <InlineSpan>[
-                    TextSpan(
-                      text: '(${set.truckCommonNavigation?.economic ?? 'Empty Economic'})?',
-                      style: const TextStyle(
+                    const TextSpan(
+                      text: '\n\u2022 Economic:',
+                      style: TextStyle(
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                  ]
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n${set.truckCommonNavigation?.economic ?? "---"}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\u2022 Carrier:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n${set.carrier}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\u2022 VIN:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n${set.vin ?? "---"}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\u2022 Mexican plate:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n${set.mxPlate ?? "---"}'),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '\n\u2022 American plate:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    WidgetSpan(
+                      baseline: TextBaseline.alphabetic,
+                      alignment: PlaceholderAlignment.bottom,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Text('\n${set.usaPlate ?? "---"}'),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               onAccept: () async {
@@ -108,17 +182,23 @@ final class _ExternalTableAdapter extends TWSArticleTableAdapter<TruckExternal> 
                 isStrictLength: true,
                 controller: TextEditingController(text: set.truckCommonNavigation!.economic),
                 onChanged: (String text) {
-                  set.truckCommonNavigation!.economic = text;
+                  set = set.clone(
+                    truckCommonNavigation: set.truckCommonNavigation?.clone(
+                      economic: text,
+                    ),
+                  );
                 },
               ),
               TWSInputText(
                 label: "Carrier",
-                hint: "enter a motor number",
+                hint: "enter a carrier number",
                 maxLength: 100,
                 isStrictLength: true,
                 controller: TextEditingController(text: set.carrier),
                 onChanged: (String text) {
-                  set.carrier = text;
+                  set = set.clone(
+                    carrier: text,
+                  );
                 },
               ),
               TWSInputText(
@@ -128,7 +208,9 @@ final class _ExternalTableAdapter extends TWSArticleTableAdapter<TruckExternal> 
                 isStrictLength: true,
                 controller: TextEditingController(text: set.mxPlate),
                 onChanged: (String text) {
-                  set.mxPlate = text;
+                  set = set.clone(
+                    mxPlate: text,
+                  );
                 },
               ),
               TWSInputText(
@@ -138,17 +220,23 @@ final class _ExternalTableAdapter extends TWSArticleTableAdapter<TruckExternal> 
                 isStrictLength: true,
                 controller: TextEditingController(text: set.usaPlate),
                 onChanged: (String text) {
-                  set.usaPlate = text;
+                  set = set.clone(
+                    usaPlate: text,
+                  );
                 },
               ),
               TWSInputText(
                 label: "VIN",
                 hint: "enter a vin number",
                 maxLength: 17,
+                isOptional: true,
+                suffixLabel: " (optional)",
                 isStrictLength: true,
                 controller: TextEditingController(text: set.vin),
                 onChanged: (String text) {
-                  set.vin = text;
+                  set = set.clone(
+                    vin: text,
+                  );
                 },
               ),
             ]

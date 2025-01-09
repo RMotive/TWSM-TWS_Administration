@@ -7,7 +7,7 @@ class _TWSAutocompleteLocal<T> extends StatelessWidget {
   final double tileHeigth;
   final CSMColorThemeOptions theme;
   final String Function(T?) displayLabel;
-  final void Function(String label) onTap;
+  final void Function(String label, T? item) onTap;
   final List<T> Function() onFirstBuild;
   final Color loadingColor;
   final Color hoverTextColor;

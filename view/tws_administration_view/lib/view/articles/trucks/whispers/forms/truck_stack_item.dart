@@ -16,7 +16,7 @@ class _TruckStackItem extends StatelessWidget {
   }
 
   String displayPlate(Plate? plate) {
-    if (plate != null && (plate.country.isNotEmpty && plate.identifier.isNotEmpty && plate.state != null)) return "${plate.country} - ${plate.identifier}";
+    if (plate != null && (plate.country.isNotEmpty && plate.identifier.isNotEmpty)) return "${plate.country} - ${plate.identifier}";
     return "---";
   }
 

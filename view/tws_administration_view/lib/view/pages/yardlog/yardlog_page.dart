@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:csm_client/csm_client.dart' hide JObject;
 import 'package:csm_view/csm_view.dart';
 import 'package:flutter/material.dart';
 import 'package:tws_administration_view/core/router/twsa_routes.dart';
@@ -12,8 +13,15 @@ import 'package:tws_administration_view/view/widgets/tws_article_table/tws_artic
 import 'package:tws_administration_view/view/widgets/tws_article_table/tws_article_table_adapter.dart';
 import 'package:tws_administration_view/view/widgets/tws_article_table/tws_article_table_agent.dart';
 import 'package:tws_administration_view/view/widgets/tws_article_table/tws_article_table_field_options.dart';
+import 'package:tws_administration_view/view/widgets/tws_autocomplete_field/tws_autocomplete_adapter.dart';
+import 'package:tws_administration_view/view/widgets/tws_autocomplete_field/tws_autocomplete_field.dart';
+import 'package:tws_administration_view/view/widgets/tws_button_flat.dart';
+import 'package:tws_administration_view/view/widgets/tws_confirmation_dialog.dart';
+import 'package:tws_administration_view/view/widgets/tws_datepicker_field.dart';
 import 'package:tws_administration_view/view/widgets/tws_image_viewer.dart';
+import 'package:tws_administration_view/view/widgets/tws_input_text.dart';
 import 'package:tws_administration_view/view/widgets/tws_property_viewer.dart';
+import 'package:tws_administration_view/view/widgets/tws_section.dart';
 import 'package:tws_foundation_client/tws_foundation_client.dart';
 
 
@@ -56,7 +64,6 @@ class YardlogPage extends CSMPageBase {
       ),
       article: TWSArticleTable<YardLog>(
         viewerTitle: "Registro",
-        editable: false,
         removable: false,
         adapter: const _TableAdapter(),
         agent: tableAgent,
@@ -133,7 +140,7 @@ class YardlogPage extends CSMPageBase {
           ),
           TWSArticleTableFieldOptions<YardLog>(
             'Sección',
-            (YardLog item, int index, BuildContext ctx) => "${item.sectionNavigation?.locationNavigation?.name} - ${item.sectionNavigation?.name}",
+            (YardLog item, int index, BuildContext ctx) => item.sectionNavigation != null? "${item.sectionNavigation?.locationNavigation?.name} - ${item.sectionNavigation?.name}" : "---",
           ),
         ],
         page: 1,

@@ -43,6 +43,8 @@ class _TruckCreatePlateForm extends StatelessWidget {
             Expanded(
               child: TWSAutoCompleteField<String>(
                 label: 'State',
+                suffixLabel: " opt.",
+                isOptional: true,
                 localList: const <String>[..._mxStateOptions, ..._usaStateOptions],
                 displayValue: (String? query) => query ?? "---" ,
                 initialValue: plate.state == "" ? null : plate.state,
@@ -65,6 +67,7 @@ class _TruckCreatePlateForm extends StatelessWidget {
               child: TWSDatepicker(
                 firstDate: _firstDate,
                 lastDate: _lastlDate,
+                suffixLabel: " opt.",
                 label: 'Expiration Date',
                 controller: TextEditingController(text: plate.expiration?.dateOnlyString),
                 onChanged: expirationOnChange,

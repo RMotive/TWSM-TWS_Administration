@@ -16,7 +16,7 @@ class _TruckCreateSituation extends StatelessWidget {
     return TWSSection(
       isOptional: true,
       padding: const EdgeInsets.symmetric(vertical: 10),
-      title: "Situation",
+      title: "Situation (optional)",
       content: TWSAutoCompleteField<Situation>(
         width: double.maxFinite,
         adapter: const _SituationsViewAdapter(),

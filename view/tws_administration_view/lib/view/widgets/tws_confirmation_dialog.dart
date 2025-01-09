@@ -130,16 +130,18 @@ class _TWSConfirmationDialogState extends State<TWSConfirmationDialog> {
                     ),
                     // --> Dialog body
                     Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: DefaultTextStyle(
-                          style: TextStyle(
-                            color: pageTheme.fore,
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: DefaultTextStyle(
+                            style: TextStyle(
+                              color: pageTheme.fore,
+                            ),
+                            child: widget.statement ??
+                                const Text(
+                                  'Are you sure you want to continue?',
+                                ),
                           ),
-                          child: widget.statement ??
-                              const Text(
-                                'Are you sure you want to continue?',
-                              ),
                         ),
                       ),
                     ),
