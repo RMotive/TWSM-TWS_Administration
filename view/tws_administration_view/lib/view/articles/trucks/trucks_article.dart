@@ -31,9 +31,12 @@ part 'options/adapters/truck_external_article_table_adapter.dart';
 part 'options/truck_article_tables_assembly.dart';
 part 'options/truck_external_table.dart';
 part 'options/truck_table.dart';
+part 'options/trucks_articles_state.dart';
+
+final TWSArticleTableAgent tableAgent = TWSArticleTableAgent();
+final _TrucksArticleState _pageState = _TrucksArticleState(tableAgent);
 
 class TrucksArticle extends CSMPageBase {
-  static final TWSArticleTableAgent tableAgent = TWSArticleTableAgent();
   const TrucksArticle({super.key});
 
   @override
@@ -46,9 +49,36 @@ class TrucksArticle extends CSMPageBase {
           onCreate: () => CSMRouter.i.drive(TWSARoutes.trucksCreateWhisper),
         ),
       ),
-      article: _TruckArticleTablesAssembly(
-        agent: tableAgent,
-      ),
+      article: CSMDynamicWidget<_TrucksArticleState>(
+        state: _pageState,
+        designer: (BuildContext ctx, _TrucksArticleState state) {
+          return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 600,
+                minWidth: 200,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 8.0, left: 8.0, right: 8.0),
+                child: TWSInputText(
+                  label: 'Search by Economic',
+                  width: double.maxFinite,
+                  deBounce: 600.miliseconds,
+                  onChanged:(String text) => state.filterSearch(text),
+                ),
+              ),
+            ),
+            Expanded(
+              child: _TruckArticleTablesAssembly(
+                agent: tableAgent,
+                state: state,
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }

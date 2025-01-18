@@ -27,10 +27,12 @@ import 'package:tws_administration_view/view/widgets/tws_section_divider.dart';
 import 'package:tws_foundation_client/tws_foundation_client.dart';
 
 part 'adapters/location_table_adapter.dart';
+part 'adapters/locations_article_state.dart'; 
 
+final TWSArticleTableAgent tableAgent = TWSArticleTableAgent();
+final _LocationssArticleState _pageState = _LocationssArticleState(tableAgent);
 
 class LocationsArticle extends CSMPageBase {
-  static final TWSArticleTableAgent tableAgent = TWSArticleTableAgent();
   const LocationsArticle({super.key});
 
   @override
@@ -43,47 +45,72 @@ class LocationsArticle extends CSMPageBase {
           onCreate: () => CSMRouter.i.drive(TWSARoutes.locationsCreateWhisper),
         ),
       ),
-      article: TWSArticleTable<Location>(
-        editable: true,
-        removable: false,
-        adapter: const _TableAdapter(),
-        agent: tableAgent,
-        fields: <TWSArticleTableFieldOptions<Location>>[
-          TWSArticleTableFieldOptions<Location>(
-            'Name',
-            (Location item, int index, BuildContext ctx) {
-             return item.name;
-            },
-          ),
-          TWSArticleTableFieldOptions<Location>(
-            'Country',
-            (Location item, int index, BuildContext ctx) {
-             return item.addressNavigation?.country ?? "---";
-            },
-          ),
-          TWSArticleTableFieldOptions<Location>(
-            'City',
-            (Location item, int index, BuildContext ctx) {
-             return item.addressNavigation?.city ?? "---";
-            },
-          ),
-          TWSArticleTableFieldOptions<Location>(
-            'Street',
-            (Location item, int index, BuildContext ctx) {
-             return item.addressNavigation?.street ?? "---";
-            },
-          ),
-          TWSArticleTableFieldOptions<Location>(
-            'Colonia',
-            (Location item, int index, BuildContext ctx) {
-             return item.addressNavigation?.colonia ?? "---";
-            },
-          ),
-        ],
-        page: 1,
-        size: 25,
-        sizes: const <int>[25, 50, 75, 100],
-      )
+      article: CSMDynamicWidget<_LocationssArticleState>(
+        state: _pageState,
+        designer: (BuildContext ctx, _LocationssArticleState state) {
+          return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 16, bottom: 8.0, left: 8.0, right: 8.0),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 600,
+                  minWidth: 200,
+                ),
+                child: TWSInputText(
+                  label: 'Search by name',
+                  deBounce: 600.miliseconds,
+                  onChanged:(String text) => state.filterName(text),
+                ),
+              ),
+            ),
+            Expanded(
+              child: TWSArticleTable<Location>(
+                editable: true,
+                removable: false,
+                adapter: _TableAdapter(state),
+                agent: tableAgent,
+                fields: <TWSArticleTableFieldOptions<Location>>[
+                  TWSArticleTableFieldOptions<Location>(
+                    'Name',
+                    (Location item, int index, BuildContext ctx) {
+                      return item.name;
+                    },
+                  ),
+                  TWSArticleTableFieldOptions<Location>(
+                    'Country',
+                    (Location item, int index, BuildContext ctx) {
+                    return item.addressNavigation?.country ?? "---";
+                    },
+                  ),
+                  TWSArticleTableFieldOptions<Location>(
+                    'City',
+                    (Location item, int index, BuildContext ctx) {
+                    return item.addressNavigation?.city ?? "---";
+                    },
+                  ),
+                  TWSArticleTableFieldOptions<Location>(
+                    'Street',
+                    (Location item, int index, BuildContext ctx) {
+                    return item.addressNavigation?.street ?? "---";
+                    },
+                  ),
+                  TWSArticleTableFieldOptions<Location>(
+                    'Colonia',
+                    (Location item, int index, BuildContext ctx) {
+                    return item.addressNavigation?.colonia ?? "---";
+                    },
+                  ),
+                ],
+                page: 1,
+                size: 25,
+                sizes: const <int>[25, 50, 75, 100],
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }

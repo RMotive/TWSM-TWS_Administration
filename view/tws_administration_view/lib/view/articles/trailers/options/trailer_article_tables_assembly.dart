@@ -5,8 +5,13 @@ part of '../trailers_article.dart';
 class _TrailerArticleTablesAssembly extends StatefulWidget {
   // Main agent for the Article.
   final TWSArticleTableAgent agent;
+  // Article State class.
+  final _TrailersArticleState state;
 
-  const _TrailerArticleTablesAssembly({required this.agent});
+  const _TrailerArticleTablesAssembly({
+    required this.agent,
+    required this.state,
+  });
 
   @override
   State<_TrailerArticleTablesAssembly> createState() =>
@@ -30,8 +35,8 @@ class _TrailerArticleTablesAssemblyState
   @override
   void initState() {
     super.initState();
-    adapter = const _TableAdapter();
-    externalAdapter = const _ExternalTableAdapter();
+    adapter = _TableAdapter(widget.state);
+    externalAdapter = _ExternalTableAdapter(widget.state);
     index = 0;
     indexedWidgets = <Widget>[
       _TrailerTable(

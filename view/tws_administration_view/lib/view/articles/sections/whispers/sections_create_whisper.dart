@@ -64,9 +64,7 @@ class SectionsCreateWhisper  extends CSMPageBase{
       child: TWSArticleCreator<Section>(
         agent: creatorAgent,
         factory: Section.a,
-        afterClose: () {
-          SectionsArticle.tableAgent.refresh();
-        }, 
+        afterClose: () => tableAgent.refresh(), 
         modelValidator: (Section model) {
           List<CSMSetValidationResult> evaluation = model.evaluate();
           if(model.locationNavigation == null) evaluation.add(const CSMSetValidationResult("LocationNavigation", "Location not selected", "emptyField()"));

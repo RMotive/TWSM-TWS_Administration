@@ -20,25 +20,12 @@ class _TrailerExternalTable extends StatelessWidget {
           (TrailerExternal item, int index, BuildContext ctx) => item.trailerCommonNavigation!.economic,
         ),
         TWSArticleTableFieldOptions<TrailerExternal>(
-          'Carrier',
-          (TrailerExternal item, int index, BuildContext ctx) => item.carrier,
-        ),
-        TWSArticleTableFieldOptions<TrailerExternal>(
-          'Type',
-          (TrailerExternal item, int index, BuildContext ctx) =>
-              item.trailerCommonNavigation?.trailerTypeNavigation != null? '${item.trailerCommonNavigation?.trailerTypeNavigation?.trailerClassNavigation?.name ?? "---"} - ${item.trailerCommonNavigation?.trailerTypeNavigation?.size ?? "---"}' : "---",
-        ),
-        TWSArticleTableFieldOptions<TrailerExternal>(
           'USA Plate',
           (TrailerExternal item, int index, BuildContext ctx) => item.usaPlate ?? "---",
         ),
         TWSArticleTableFieldOptions<TrailerExternal>(
           'MX Plate',
           (TrailerExternal item, int index, BuildContext ctx) => item.mxPlate ?? "---",
-        ),
-        TWSArticleTableFieldOptions<TrailerExternal>(
-          'Situation',
-          (TrailerExternal item, int index, BuildContext ctx) => item.trailerCommonNavigation?.situationNavigation?.name ?? "---",
         ),
       ],
       page: 1,

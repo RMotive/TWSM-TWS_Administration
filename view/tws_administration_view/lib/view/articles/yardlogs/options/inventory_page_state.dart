@@ -7,7 +7,7 @@ final class _InventoryPageState extends CSMStateBase {
   final TWSArticleTableAgent tableAgent;
 
   ///
-  List<SetViewFilterNodeInterface<TruckInventory>> filters = <SetViewFilterNodeInterface<TruckInventory>>[];
+  List<SetViewFilterNodeInterface<YardLog>> filters = <SetViewFilterNodeInterface<YardLog>>[];
 
   ///
   Section? sectionFilter;
@@ -20,7 +20,7 @@ final class _InventoryPageState extends CSMStateBase {
 
   ///
   _InventoryPageState(this.tableAgent) {
-    SetViewDateFilter<TruckInventory> dateFilterOption = SetViewDateFilter<TruckInventory>(0, dateFilter.$1, dateFilter.$2);
+    SetViewDateFilter<YardLog> dateFilterOption = SetViewDateFilter<YardLog>(0, dateFilter.$1, dateFilter.$2);
     filters.add(dateFilterOption);
   }
 
@@ -43,26 +43,27 @@ final class _InventoryPageState extends CSMStateBase {
     _composeFilters();
   }
 
-  _composeFilters() {
-    filters = <SetViewFilterNodeInterface<TruckInventory>>[];
+   _composeFilters() {
+    filters = <SetViewFilterNodeInterface<YardLog>>[];
 
-    SetViewDateFilter<TruckInventory> dateFilterOption = SetViewDateFilter<TruckInventory>(0, dateFilter.$1, dateFilter.$2);
+    SetViewDateFilter<YardLog> dateFilterOption = SetViewDateFilter<YardLog>(0, dateFilter.$1, dateFilter.$2);
     filters.add(dateFilterOption);
 
     if (sectionFilter != null) {
-      SetViewFilterNodeInterface<TruckInventory> nodeFilter = SetViewPropertyFilter<TruckInventory>(1, SetViewFilterEvaluations.equal, YardLog.kSection, sectionFilter!.id);
+      SetViewFilterNodeInterface<YardLog> nodeFilter = SetViewPropertyFilter<YardLog>(1, SetViewFilterEvaluations.equal, YardLog.kSection, sectionFilter!.id);
       filters.add(nodeFilter);
     }
 
     if (searchFilter.isNotEmpty) {
-      SetViewPropertyFilter<TruckInventory> econoFilter = SetViewPropertyFilter<TruckInventory>(0, SetViewFilterEvaluations.contians, 'TruckNavigation.TruckCommonNavigation.Economic', searchFilter);
-      SetViewPropertyFilter<TruckInventory> econoFilterExternal = SetViewPropertyFilter<TruckInventory>(0, SetViewFilterEvaluations.contians, 'TruckExternalNavigation.TruckCommonNavigation.Economic', searchFilter);
-      List<SetViewFilterInterface<TruckInventory>> searchFilterFilters = <SetViewFilterInterface<TruckInventory>>[
+      SetViewPropertyFilter<YardLog> econoFilter = SetViewPropertyFilter<YardLog>(0, SetViewFilterEvaluations.contians, 'TrailerNavigation.TrailerCommonNavigation.Economic', searchFilter);
+      SetViewPropertyFilter<YardLog> econoFilterExternal =
+          SetViewPropertyFilter<YardLog>(0, SetViewFilterEvaluations.contians, 'TrailerExternalNavigation.TrailerCommonNavigation.Economic', searchFilter);
+      List<SetViewFilterInterface<YardLog>> searchFilterFilters = <SetViewFilterInterface<YardLog>>[
         econoFilter,
         econoFilterExternal,
       ];
 
-      SetViewFilterLinearEvaluation<TruckInventory> searchFilterOption = SetViewFilterLinearEvaluation<TruckInventory>(2, SetViewFilterEvaluationOperators.or, searchFilterFilters);
+      SetViewFilterLinearEvaluation<YardLog> searchFilterOption = SetViewFilterLinearEvaluation<YardLog>(2, SetViewFilterEvaluationOperators.or, searchFilterFilters);
       filters.add(searchFilterOption);
     }
 

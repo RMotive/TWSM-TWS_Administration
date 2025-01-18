@@ -20,6 +20,15 @@ final class _TrailerState extends CSMStateBase {}
 final _TrailerState _trailerState = _TrailerState();
 void Function() _trailerEffect = (){};
 
+final class _SectionState extends CSMStateBase {}
+final _SectionState _sectionState = _SectionState();
+void Function() _sectionEffect = (){};
+
+final class _DialogState extends CSMStateBase {}
+final _DialogState _dialogState = _DialogState();
+void Function() _dialogEffect = (){};
+
+
 final class _TableAdapter extends TWSArticleTableAdapter<YardLog> {
   const _TableAdapter();
 
@@ -58,238 +67,281 @@ final class _TableAdapter extends TWSArticleTableAdapter<YardLog> {
   TWSArticleTableEditor? composeEditor(YardLog set, void Function() closeReinvoke, BuildContext context) {
     Uint8List? truckPicture = _getBytes(set.ttPicture);
     Uint8List? damagePicture = set.dmgEvidence != null? _getBytes(set.dmgEvidence!) : null;
+    bool exceptionFlag = false;
+    String xMessage = '---';
 
     return TWSArticleTableEditor(
       onCancel: closeReinvoke,
       onSave:() async {
+        exceptionFlag = false;
+        xMessage = '---';
         showDialog(
           context: context,
           useRootNavigator: true,
           barrierDismissible: false,
           builder: (BuildContext context) {
-            return TWSConfirmationDialog(
-              accept: 'Update',
-              title: 'Yardlog update confirmation',
-              statement: Text.rich(
-                textAlign: TextAlign.center,
-                TextSpan(
-                    text: 'Are you sure you want to update this Yardlog?',
-                  children: <InlineSpan>[
-                   const TextSpan(
-                      text: '\n',
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Log type:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
+            return CSMDynamicWidget<_DialogState>(
+              state: _dialogState, 
+              designer:(BuildContext ctx, _DialogState state) {
+                _dialogEffect = state.effect;
+                return exceptionFlag? TWSConfirmationDialog(
+                  showCancelButton: false,
+                  accept: 'OK',
+                  title: 'Unexpected error on update.',
+                  statement: Text.rich(
+                    textAlign: TextAlign.center,
+                    TextSpan(
+                      text: 'Unexpected problem. Please retry the operation or contact your administrator.',
+                      children: <InlineSpan>[
+                        const TextSpan(
+                          text: '\n\nError message:\n\n',
+                          style: TextStyle(fontWeight: FontWeight.bold),                        
                         ),
-                        child: Text('\n${set.entry? "Entry" : "Departure"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Damage type:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
+                        TextSpan(
+                         text: xMessage
                         ),
-                        child: Text('\n${set.damage? "Damaged" : "Not damaged"}'),
-                      ),
+
+                      ],
+                      
                     ),
-                    const TextSpan(
-                      text: '\n\u2022 Load type:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
+                  ),
+                  onAccept: () {
+                    Navigator.of(context).pop();
+                  },
+                ) :
+                TWSConfirmationDialog(
+                  accept: 'Update',
+                  title: 'Yardlog update confirmation',
+                  statement: Text.rich(
+                    textAlign: TextAlign.center,
+                    TextSpan(
+                        text: 'Are you sure you want to update this Yardlog?',
+                      children: <InlineSpan>[
+                      const TextSpan(
+                          text: '\n',
                         ),
-                        child: Text('\n${set.loadType == 1? "Loaded": set.loadType == 2? "Not loaded" : "Botado"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Timestamp:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${DateTime.tryParse(set.timestamp.toString()) ?? 'Invalid date'}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Truck:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.truckNavigation?.truckCommonNavigation?.economic ?? set.truckExternalNavigation?.truckCommonNavigation?.economic ?? '---'}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Trailer:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.trailerNavigation?.trailerCommonNavigation?.economic ?? set.trailerNavigation?.trailerCommonNavigation?.economic ?? '---'}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Driver:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${_getDriverName(set)}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Section:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.sectionNavigation?.name ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Sello 1:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.seal ?? '---'}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Sello 2:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.sealAlt ?? '---'}'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              onAccept: () async {
-                List<CSMSetValidationResult> evaluation = set.evaluate();
-                if (evaluation.isEmpty) {
-                  final String auth = _sessionStorage.getTokenStrict();
-                  MainResolver<RecordUpdateOut<YardLog>> resolverUpdateOut =
-                      await Sources.foundationSource.yardLogs.update(set, auth);
-                  try {
-                    resolverUpdateOut
-                        .act((JObject json) =>
-                            RecordUpdateOut<YardLog>.des(json, YardLog.des))
-                        .then(
-                      (RecordUpdateOut<YardLog> updateOut) {
-                        CSMRouter.i.pop();
-                      },
-                    );
-                  } catch (x) {
-                    debugPrint(x.toString());
-                  }
-                } else {
-                  // --> Evaluation error dialog
-                  CSMRouter.i.pop();
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return TWSConfirmationDialog(
-                        showCancelButton: false,
-                        accept: 'Ok',
-                        title: 'Invalid form data',
-                        statement: Text.rich(
-                          TextSpan(
-                            text: 'Verify the data form:\n\n',
-                            children: <InlineSpan>[
-                              for (int i = 0; i < evaluation.length; i++)
-                                TextSpan(
-                                  text:
-                                      "${i + 1} - ${evaluation[i].property}: ${evaluation[i].reason}\n",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600),
-                                ),
-                            ],
+                        const TextSpan(
+                          text: '\n\u2022 Log type:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                        onAccept: () {
-                          Navigator.of(context).pop();
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.entry? "Entry" : "Departure"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Damage type:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.damage? "Damaged" : "Not damaged"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Load type:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.loadType == 1? "Loaded": set.loadType == 2? "Not loaded" : "Botado"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Timestamp:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${DateTime.tryParse(set.timestamp.toString()) ?? 'Invalid date'}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Truck:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.truckNavigation?.truckCommonNavigation?.economic ?? set.truckExternalNavigation?.truckCommonNavigation?.economic ?? '---'}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Trailer:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.trailerNavigation?.trailerCommonNavigation?.economic ?? set.trailerNavigation?.trailerCommonNavigation?.economic ?? '---'}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Driver:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${_getDriverName(set)}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Section:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.sectionNavigation?.name ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Sello 1:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.seal ?? '---'}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Sello 2:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.sealAlt ?? '---'}'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  onAccept: () async {
+                    List<CSMSetValidationResult> evaluation = set.evaluate();
+                    if (evaluation.isEmpty) {
+                      final String auth = _sessionStorage.getTokenStrict();
+                      MainResolver<RecordUpdateOut<YardLog>> resolverUpdateOut =
+                          await Sources.foundationSource.yardLogs.update(set, auth);
+                      try {
+                        resolverUpdateOut
+                            .act((JObject json) =>
+                                RecordUpdateOut<YardLog>.des(json, YardLog.des))
+                            .then(
+                          (RecordUpdateOut<YardLog> updateOut) {
+                            CSMRouter.i.pop();
+                          },
+                        ).onError(
+                          (Object? x, _){
+                            exceptionFlag = true;
+                            xMessage = x.toString();
+                            _dialogEffect();
+                          }
+                        );
+                      } catch (x) {
+                        exceptionFlag = true;
+                        xMessage = x.toString();
+                        _dialogEffect();
+                      }
+                    } else {
+                      // --> Evaluation error dialog
+                      CSMRouter.i.pop();
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return TWSConfirmationDialog(
+                            showCancelButton: false,
+                            accept: 'Ok',
+                            title: 'Invalid form data',
+                            statement: Text.rich(
+                              TextSpan(
+                                text: 'Verify the data form:\n\n',
+                                children: <InlineSpan>[
+                                  for (int i = 0; i < evaluation.length; i++)
+                                    TextSpan(
+                                      text:
+                                          "${i + 1} - ${evaluation[i].property}: ${evaluation[i].reason}\n",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            onAccept: () {
+                              Navigator.of(context).pop();
+                            },
+                          );
                         },
                       );
-                    },
-                  );
-                }
+                    }
+                  },
+                );
               },
             );
           },
@@ -317,6 +369,7 @@ final class _TableAdapter extends TWSArticleTableAdapter<YardLog> {
                             disabled: set.entry,
                             onTap: (){
                               set.entry = true;
+                              _sectionEffect();
                               state.effect();
                             } 
                           ),
@@ -327,6 +380,9 @@ final class _TableAdapter extends TWSArticleTableAdapter<YardLog> {
                             disabled: !set.entry,
                             onTap: (){
                               set.entry = false;
+                              set.sectionNavigation = null;
+                              set.section = null;
+                              _sectionEffect();
                               state.effect();
                             } 
                           ),
@@ -510,22 +566,31 @@ final class _TableAdapter extends TWSArticleTableAdapter<YardLog> {
                   );
                 },
               ),
-              TWSAutoCompleteField<Section>(
-                width: double.maxFinite,
-                label: "Section",
-                hint: "Select a section",
-                isOptional: true,
-                adapter: const _SectionViewAdapter(),
-                initialValue: set.sectionNavigation,
-                displayValue: (Section? set) {
-                  return set != null && set.locationNavigation != null
-                      ? "${set.locationNavigation?.name} - ${set.name}: ${(set.ocupancy / set.capacity) * 100}% Ocupado"
-                      : 'Unexpected value';
-                },
-                onChanged: (Section? selectedItem) {
-                  set = set.clone(
-                    section:  selectedItem?.id ?? 0,
-                    sectionNavigation:  selectedItem,
+              CSMDynamicWidget<_SectionState>(
+                state: _sectionState, 
+                designer:(BuildContext ctx, _SectionState state) {
+                  _sectionEffect = state.effect;
+                  return Visibility(
+                    visible: set.entry,
+                    child: TWSAutoCompleteField<Section>(
+                      width: double.maxFinite,
+                      label: "Section",
+                      hint: "Select a section",
+                      isOptional: true,
+                      adapter: const _SectionViewAdapter(),
+                      initialValue: set.sectionNavigation,
+                      displayValue: (Section? set) {
+                        return set != null && set.locationNavigation != null
+                            ? "${set.locationNavigation?.name} - ${set.name}: ${(set.ocupancy / set.capacity) * 100}% Ocupado"
+                            : 'Unexpected value';
+                      },
+                      onChanged: (Section? selectedItem) {
+                        set = set.clone(
+                          section:  selectedItem?.id ?? 0,
+                          sectionNavigation:  selectedItem,
+                        );
+                      },
+                    ),
                   );
                 },
               ),

@@ -122,7 +122,7 @@ class DriversCreateWhisper  extends CSMPageBase{
         agent: creatorAgent,
         factory: Driver.a,
         afterClose: () {
-          DriversArticle.tableAgent.refresh();
+          tableAgent.refresh();
         }, 
         modelValidator: (Object model) {
           if(model is Driver) return model.evaluate().isEmpty;

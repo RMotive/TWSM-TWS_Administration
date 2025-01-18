@@ -1,5 +1,5 @@
 import 'package:csm_client/csm_client.dart';
-import 'package:csm_view/csm_view.dart' hide JObject; 
+import 'package:csm_view/csm_view.dart' hide JObject;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tws_administration_view/core/router/twsa_routes.dart';
@@ -21,10 +21,12 @@ import 'package:tws_administration_view/view/widgets/tws_property_viewer.dart';
 import 'package:tws_foundation_client/tws_foundation_client.dart';
 
 part 'adapters/sections_table_adapter.dart';
+part 'adapters/sections_article_state.dart';
 
+final TWSArticleTableAgent tableAgent = TWSArticleTableAgent();
+final _SectionArticleState _pageState = _SectionArticleState(tableAgent);
 
 class SectionsArticle extends CSMPageBase {
-  static final TWSArticleTableAgent tableAgent = TWSArticleTableAgent();
   const SectionsArticle({super.key});
 
   @override
@@ -37,41 +39,81 @@ class SectionsArticle extends CSMPageBase {
           onCreate: () => CSMRouter.i.drive(TWSARoutes.sectionsCreateWhisper),
         ),
       ),
-      article: TWSArticleTable<Section>(
-        editable: true,
-        removable: false,
-        adapter: const _TableAdapter(),
-        agent: tableAgent,
-        fields: <TWSArticleTableFieldOptions<Section>>[
-          TWSArticleTableFieldOptions<Section>(
-            'Name',
-            (Section item, int index, BuildContext ctx) {
-             return item.name;
-            },
-          ),
-          TWSArticleTableFieldOptions<Section>(
-            'Location',
-            (Section item, int index, BuildContext ctx) {
-             return item.locationNavigation?.name ?? '---';
-            },
-          ),
-          TWSArticleTableFieldOptions<Section>(
-            'Capacity',
-            (Section item, int index, BuildContext ctx) {
-             return item.capacity.toString();
-            },
-          ),
-          TWSArticleTableFieldOptions<Section>(
-            'Ocupancy',
-            (Section item, int index, BuildContext ctx) {
-             return item.ocupancy.toString();
-            },
-          ),
-        ],
-        page: 1,
-        size: 25,
-        sizes: const <int>[25, 50, 75, 100],
-      )
+      article: CSMDynamicWidget<_SectionArticleState>(
+          state: _pageState,
+          designer: (BuildContext ctx, _SectionArticleState state) {
+            return Column(
+              children: <Widget>[
+                Padding(
+                  padding:const EdgeInsets.only(
+                    top: 16,
+                    bottom: 8.0,
+                    left: 8.0,
+                    right: 8.0,
+                  ),
+                  child: SizedBox(
+                    width: double.maxFinite,
+                    child: Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: <Widget>[
+                        TWSInputText(
+                          label: 'Search by name',
+                          deBounce: 600.miliseconds,
+                          width: 250,
+                          onChanged: (String text) => state.filterName(text),
+                        ),
+                        TWSInputText(
+                          label: 'Search by location',
+                          deBounce: 600.miliseconds,
+                          width: 250,
+                          onChanged: (String text) => state.filterLocation(text),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: TWSArticleTable<Section>(
+                    editable: true,
+                    removable: false,
+                    adapter: _TableAdapter(state),
+                    agent: tableAgent,
+                    fields: <TWSArticleTableFieldOptions<Section>>[
+                      TWSArticleTableFieldOptions<Section>(
+                        'Name',
+                        (Section item, int index, BuildContext ctx) {
+                          return item.name;
+                        },
+                      ),
+                      TWSArticleTableFieldOptions<Section>(
+                        'Location',
+                        (Section item, int index, BuildContext ctx) {
+                          return item.locationNavigation?.name ?? '---';
+                        },
+                      ),
+                      TWSArticleTableFieldOptions<Section>(
+                        'Capacity',
+                        (Section item, int index, BuildContext ctx) {
+                          return item.capacity.toString();
+                        },
+                      ),
+                      TWSArticleTableFieldOptions<Section>(
+                        'Ocupancy',
+                        (Section item, int index, BuildContext ctx) {
+                          return item.ocupancy.toString();
+                        },
+                      ),
+                    ],
+                    page: 1,
+                    size: 25,
+                    sizes: const <int>[25, 50, 75, 100],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
     );
   }
 }

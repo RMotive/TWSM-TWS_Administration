@@ -5,16 +5,20 @@ part of '../trucks_article.dart';
 class _TruckArticleTablesAssembly extends StatefulWidget {
   // Main agent for the Article.
   final TWSArticleTableAgent agent;
+  // Article State class.
+  final _TrucksArticleState state;
 
-  const _TruckArticleTablesAssembly({required this.agent});
+  const _TruckArticleTablesAssembly({
+    required this.agent,
+    required this.state,  
+  });
 
   @override
   State<_TruckArticleTablesAssembly> createState() =>
       _TruckArticleTablesAssemblyState();
 }
 
-class _TruckArticleTablesAssemblyState
-    extends State<_TruckArticleTablesAssembly> {
+class _TruckArticleTablesAssemblyState extends State<_TruckArticleTablesAssembly> {
   // Table adapters declaration.
   late _TableAdapter adapter;
   late _ExternalTableAdapter externalAdapter;
@@ -30,8 +34,8 @@ class _TruckArticleTablesAssemblyState
   @override
   void initState() {
     super.initState();
-    adapter = const _TableAdapter();
-    externalAdapter = const _ExternalTableAdapter();
+    adapter = _TableAdapter(widget.state);
+    externalAdapter = _ExternalTableAdapter(widget.state);
     index = 0;
     indexedWidgets = <Widget>[
       _TruckTable(

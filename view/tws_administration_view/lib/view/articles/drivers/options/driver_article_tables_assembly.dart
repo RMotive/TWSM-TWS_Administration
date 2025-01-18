@@ -4,8 +4,13 @@ part of '../drivers_article.dart';
 class _DriverArticleTablesAssembly extends StatefulWidget {
   // Main agent for the Article.
   final TWSArticleTableAgent agent;
+  // Article State class.
+  final _DriversArticleState state;
 
-  const _DriverArticleTablesAssembly({required this.agent});
+  const _DriverArticleTablesAssembly({
+    required this.agent,
+    required this.state,
+  });
 
   @override
   State<_DriverArticleTablesAssembly> createState() => _DriverArticleTablesAssemblyState();
@@ -27,8 +32,8 @@ class _DriverArticleTablesAssemblyState extends State<_DriverArticleTablesAssemb
   @override
   void initState() {
     super.initState();
-    adapter = const _TableAdapter();
-    externalAdapter = const _ExternalTableAdapter();
+    adapter = _TableAdapter(widget.state);
+    externalAdapter = _ExternalTableAdapter(widget.state);
     index = 0;
     indexedWidgets = <Widget>[
       _DriversTable(

@@ -37,12 +37,6 @@ class _DriversExternalTable extends StatelessWidget {
           (DriverExternal item, int index, BuildContext ctx) =>
               item.identificationNavigation?.motherlastname ?? '---',
         ),
-        TWSArticleTableFieldOptions<DriverExternal>(
-          'Birthday date',
-          (DriverExternal item, int index, BuildContext ctx) =>
-              item.identificationNavigation?.birthday?.dateOnlyString ?? '---',
-        ),
-       
       ],
       page: 1,
       size: 25,

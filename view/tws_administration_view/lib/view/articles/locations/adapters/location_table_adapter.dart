@@ -10,6 +10,11 @@ class _AddressCreationState extends CSMStateBase { }
 final _AddressCreationState _addressState = _AddressCreationState();
 void Function() _addressEffect = () {};
 
+final class _DialogState extends CSMStateBase {}
+final _DialogState _dialogState = _DialogState();
+void Function() _dialogEffect = (){};
+
+
 final class _AddressesViewAdapter implements TWSAutocompleteAdapter{
   const _AddressesViewAdapter();
   
@@ -60,11 +65,12 @@ _WaypointState _waypointState = _WaypointState();
 
 
 final class _TableAdapter extends TWSArticleTableAdapter<Location> {
-  const _TableAdapter();
+  final _LocationssArticleState state;
+  const _TableAdapter(this.state);
 
  @override
   Future<SetViewOut<Location>> consume(int page, int range, List<SetViewOrderOptions> orderings) async {
-    final SetViewOptions<Location> options = SetViewOptions<Location>(false, range, page, null, orderings, <SetViewFilterNodeInterface<Location>>[]);
+    final SetViewOptions<Location> options = SetViewOptions<Location>(false, range, page, null, orderings, state.locationsFilters);
     String auth = _sessionStorage.session!.token;
     MainResolver<SetViewOut<Location>> resolver = await Sources.foundationSource.locations.view(options, auth);
 
@@ -79,239 +85,282 @@ final class _TableAdapter extends TWSArticleTableAdapter<Location> {
 
   @override
   TWSArticleTableEditor? composeEditor(Location set, void Function() closeReinvoke, BuildContext context) {
-    
+    bool exceptionFlag = false;
+    String xMessage = '---';
+
     return TWSArticleTableEditor(
       onCancel: closeReinvoke,
       onSave: () async {
+        exceptionFlag = false;
+        xMessage = '---';
         showDialog(
           context: context, 
           useRootNavigator: true,
           barrierDismissible: false,
           builder:(BuildContext context) {
-            return TWSConfirmationDialog(
-              accept: 'Update',
-              title: 'Location update confirmation',
-              onAccept: () async {
-                List<CSMSetValidationResult> evaluation = set.evaluate();
-                if (evaluation.isEmpty) {
-                  final String auth = _sessionStorage.getTokenStrict();
-                  MainResolver<RecordUpdateOut<Location>> resolverUpdateOut =
-                      await Sources.foundationSource.locations.update(set, auth);
-                  try {
-                    resolverUpdateOut
-                        .act((JObject json) =>
-                            RecordUpdateOut<Location>.des(json, Location.des))
-                        .then(
-                      (RecordUpdateOut<Location> updateOut) {
-                        CSMRouter.i.pop();
-                      },
-                    );
-                  } catch (x) {
-                    debugPrint(x.toString());
-                  }
-                } else {
-                  // --> Evaluation error dialog
-                  CSMRouter.i.pop();
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return TWSConfirmationDialog(
-                        showCancelButton: false,
-                        accept: 'Ok',
-                        title: 'Invalid form data',
-                        statement: Text.rich(
-                          TextSpan(
-                            text: 'Verify the data form:\n\n',
-                            children: <InlineSpan>[
-                              for (int i = 0; i < evaluation.length; i++)
-                                TextSpan(
-                                  text:
-                                      "${i + 1} - ${evaluation[i].property}: ${evaluation[i].reason}\n",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600),
-                                ),
-                            ],
-                          ),
+            return CSMDynamicWidget<_DialogState>(
+              state: _dialogState, 
+              designer:(BuildContext ctx, _DialogState state) {
+                _dialogEffect = state.effect;
+                return exceptionFlag? TWSConfirmationDialog(
+                  showCancelButton: false,
+                  accept: 'OK',
+                  title: 'Unexpected error on update.',
+                  statement: Text.rich(
+                    textAlign: TextAlign.center,
+                    TextSpan(
+                      text: 'Unexpected problem. Please retry the operation or contact your administrator.',
+                      children: <InlineSpan>[
+                        const TextSpan(
+                          text: '\n\nError message:\n\n',
+                          style: TextStyle(fontWeight: FontWeight.bold),                        
                         ),
-                        onAccept: () {
-                          Navigator.of(context).pop();
+                        TextSpan(
+                         text: xMessage
+                        ),
+
+                      ],
+                      
+                    ),
+                  ),
+                  onAccept: () {
+                    Navigator.of(context).pop();
+                  },
+                ) :  
+                TWSConfirmationDialog(
+                  accept: 'Update',
+                  title: 'Location update confirmation',
+                  onAccept: () async {
+                    List<CSMSetValidationResult> evaluation = set.evaluate();
+                    if (evaluation.isEmpty) {
+                      final String auth = _sessionStorage.getTokenStrict();
+                      MainResolver<RecordUpdateOut<Location>> resolverUpdateOut =
+                          await Sources.foundationSource.locations.update(set, auth);
+                      try {
+                        resolverUpdateOut
+                            .act((JObject json) =>
+                                RecordUpdateOut<Location>.des(json, Location.des))
+                            .then(
+                          (RecordUpdateOut<Location> updateOut) {
+                            CSMRouter.i.pop();
+                          },
+                        ).onError(
+                          (Object? x, _){
+                            exceptionFlag = true;
+                            xMessage = x.toString();
+                            _dialogEffect();
+                          }
+                        );
+                      } catch (x) {
+                        exceptionFlag = true;
+                        xMessage = x.toString();
+                        _dialogEffect();
+                      }
+                    } else {
+                      // --> Evaluation error dialog
+                      CSMRouter.i.pop();
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return TWSConfirmationDialog(
+                            showCancelButton: false,
+                            accept: 'Ok',
+                            title: 'Invalid form data',
+                            statement: Text.rich(
+                              TextSpan(
+                                text: 'Verify the data form:\n\n',
+                                children: <InlineSpan>[
+                                  for (int i = 0; i < evaluation.length; i++)
+                                    TextSpan(
+                                      text:
+                                          "${i + 1} - ${evaluation[i].property}: ${evaluation[i].reason}\n",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            onAccept: () {
+                              Navigator.of(context).pop();
+                            },
+                          );
                         },
                       );
-                    },
-                  );
-                }
+                    }
+                  },
+                  statement: Text.rich(
+                    textAlign: TextAlign.center,
+                    TextSpan(
+                      text: 'Are you sure you want to update a location?',
+                      children: <InlineSpan>[
+                        const TextSpan(
+                          text: '\n',
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Name:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.name}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Country:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.addressNavigation?.country ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 State:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.addressNavigation?.state ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 City:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.addressNavigation?.city ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Street:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.addressNavigation?.street ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 ZIP:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.addressNavigation?.zip ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Colonia:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.addressNavigation?.colonia ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Longitude:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.waypointNavigation?.longitude ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Latitude:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.waypointNavigation?.latitude ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Altitude:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.waypointNavigation?.altitude ?? "---"}'),
+                          ),
+                        ),
+                      ]
+                    )
+                  ),
+                );
               },
-              statement: Text.rich(
-                textAlign: TextAlign.center,
-                TextSpan(
-                  text: 'Are you sure you want to update a location?',
-                  children: <InlineSpan>[
-                    const TextSpan(
-                      text: '\n',
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Name:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.name}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Country:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.addressNavigation?.country ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 State:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.addressNavigation?.state ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 City:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.addressNavigation?.city ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Street:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.addressNavigation?.street ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 ZIP:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.addressNavigation?.zip ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Colonia:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.addressNavigation?.colonia ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Longitude:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.waypointNavigation?.longitude ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Latitude:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.waypointNavigation?.latitude ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Altitude:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.waypointNavigation?.altitude ?? "---"}'),
-                      ),
-                    ),
-                  ]
-                )
-              ),
             );
           },
         );

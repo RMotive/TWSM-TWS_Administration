@@ -3,23 +3,23 @@ part of '../truck_inventory_article.dart';
 final SessionStorage _sessionStorage = SessionStorage.i;
 
 
-final class _TableAdapter extends TWSArticleTableAdapter<TruckInventory> {
+final class _TableAdapter extends TWSArticleTableAdapter<YardLog> {
   final _InventoryPageState state;
 
   const _TableAdapter(this.state);
 
-  String getPlates(TruckInventory item, bool isMXplate){
+  String getPlates(YardLog item, bool isMXplate){
     if(isMXplate) return item.truckNavigation?.plates.where((Plate i) => i.country == TWSAMessages.kCountryList[1]).lastOrNull?.identifier ?? item.truckExternalNavigation?.mxPlate ?? '---';
     return item.truckNavigation?.plates.where((Plate i) => i.country == TWSAMessages.kCountryList[0]).lastOrNull?.identifier ?? item.truckExternalNavigation?.usaPlate ?? '---';
   }
 
   @override
-  Future<SetViewOut<TruckInventory>> consume(int page, int range, List<SetViewOrderOptions> orderings) async {
-    final SetViewOptions<TruckInventory> options = SetViewOptions<TruckInventory>(false, range, page, null, orderings, state.filters);
+  Future<SetViewOut<YardLog>> consume(int page, int range, List<SetViewOrderOptions> orderings) async {
+    final SetViewOptions<YardLog> options = SetViewOptions<YardLog>(false, range, page, null, orderings, state.filters);
     String auth = _sessionStorage.session!.token;
-    MainResolver<SetViewOut<TruckInventory>> resolver = await Sources.foundationSource.trucksInventories.view(options, auth);
+    MainResolver<SetViewOut<YardLog>> resolver = await Sources.foundationSource.yardLogs.viewInventory(options, auth);
 
-    SetViewOut<TruckInventory> view = await resolver.act((Map<String, dynamic> json) => SetViewOut<TruckInventory>.des(json, TruckInventory.des)).catchError(
+    SetViewOut<YardLog> view = await resolver.act((Map<String, dynamic> json) => SetViewOut<YardLog>.des(json, YardLog.des)).catchError(
       (Object x, StackTrace s) {
         const CSMAdvisor('yard-table-adapter').exception('Exception catched at table view consume', Exception(x), s);
         throw x;
@@ -29,21 +29,17 @@ final class _TableAdapter extends TWSArticleTableAdapter<TruckInventory> {
   }
   
   @override
-  TWSArticleTableEditor? composeEditor(TruckInventory set, Function closeReinvoke, BuildContext context) {
+  TWSArticleTableEditor? composeEditor(YardLog set, Function closeReinvoke, BuildContext context) {
     return null;
   }
 
   @override
-  Widget composeViewer(TruckInventory set, BuildContext context) {
+  Widget composeViewer(YardLog set, BuildContext context) {
     return SizedBox.expand(
       child: CSMSpacingColumn(
         spacing: 12,
         crossAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          TWSPropertyViewer(
-            label: 'Entry',
-            value: set.entryDate.toLocal().toString(),
-          ),
           TWSPropertyViewer(
             label: 'Economic',
             value: set.truckNavigation?.truckCommonNavigation?.economic ?? set.truckExternalNavigation?.truckCommonNavigation?.economic ?? "---",

@@ -68,6 +68,9 @@
         - [KeyboardType] Property.
     41. Extensions files removed and migrated to foundation environment.
     42. Added [Sections] article.
+    43. Added [View] table, [Create] & [Update] whispers for [Locations] article.
+    44. Added search filters to [View] table whispers for all articles in [Business] module.
+    45. Added exceptions notifications in update forms in all articles for [Business] module.
 
 - Dependencies upgrade:
     1. (-) tws_foundation_client: Deprecated now used tws_foundation_client

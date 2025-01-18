@@ -138,7 +138,7 @@ class TrailersCreateWhisper extends CSMPageBase{
         agent: creatorAgent,
         factory: Trailer.a,
         afterClose: () {
-          TrailersArticle.tableAgent.refresh();
+          tableAgent.refresh();
         }, 
         modelValidator: (Object model) {
           if(model is Trailer) return model.evaluate().isEmpty;

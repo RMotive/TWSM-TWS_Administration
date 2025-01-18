@@ -31,9 +31,12 @@ part 'options/adapters/trailer_external_article_table_adapter.dart';
 part 'options/trailer_article_tables_assembly.dart';
 part 'options/trailer_external_table.dart';
 part 'options/trailer_table.dart';
+part 'options/trailers_article_state.dart';
+
+final TWSArticleTableAgent tableAgent = TWSArticleTableAgent();
+final _TrailersArticleState _pageState = _TrailersArticleState(tableAgent);
 
 class TrailersArticle extends CSMPageBase {
-  static final TWSArticleTableAgent tableAgent = TWSArticleTableAgent();
   const TrailersArticle({super.key});
 
   @override
@@ -46,9 +49,39 @@ class TrailersArticle extends CSMPageBase {
           onCreate: () => CSMRouter.i.drive(TWSARoutes.trailersCreateWhisper),
         ),
       ),
-      article: _TrailerArticleTablesAssembly(
-        agent: tableAgent,
+      article: 
+      
+      CSMDynamicWidget<_TrailersArticleState>(
+        state: _pageState,
+        designer: (BuildContext ctx, _TrailersArticleState state) {
+          return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 600
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 8.0, left: 8.0, right: 8.0),
+                child: TWSInputText(
+                  label: 'Search by Economic',
+                  deBounce: 600.miliseconds,
+                  width: double.maxFinite,
+                  onChanged:(String text) => state.filterSearch(text),
+                ),
+              ),
+            ),
+            Expanded(
+              child: _TrailerArticleTablesAssembly(
+                agent: tableAgent,
+                state: state,
+              ),
+            ),
+          ],
+        );
+        },
       ),
+      
     );
   }
 }

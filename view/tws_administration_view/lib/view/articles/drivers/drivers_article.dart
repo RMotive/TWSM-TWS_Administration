@@ -29,9 +29,12 @@ part 'options/adapters/drivers_table_adapter.dart';
 part 'options/adapters/drivers_externals_table_adapter.dart';
 part 'options/drivers_table.dart';
 part 'options/drivers_externals_table.dart';
+part 'options/drivers_article_state.dart';
+
+final TWSArticleTableAgent tableAgent = TWSArticleTableAgent();
+final _DriversArticleState _pageState = _DriversArticleState(tableAgent);
 
 class DriversArticle extends CSMPageBase {
-  static final TWSArticleTableAgent tableAgent = TWSArticleTableAgent();
   const DriversArticle({super.key});
 
   @override
@@ -44,9 +47,58 @@ class DriversArticle extends CSMPageBase {
           onCreate: () => CSMRouter.i.drive(TWSARoutes.driversCreateWhisper),
         ),
       ),
-      article: _DriverArticleTablesAssembly(
-        agent: tableAgent,
-      ),
+      article: CSMDynamicWidget<_DriversArticleState>(
+        state: _pageState,
+        designer: (BuildContext ctx, _DriversArticleState state) {
+          double optionsWidth = 250;
+          return Column(
+          children: <Widget>[
+            SizedBox(
+              width: double.maxFinite,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 8.0, left: 8.0, right: 8.0),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: <Widget>[
+                    TWSInputText(
+                      label: 'Search by license',
+                      deBounce: 600.miliseconds,
+                      width: optionsWidth,
+                      onChanged:(String text) => state.filterLicense(text),
+                    ),
+                      TWSInputText(
+                      label: 'Search by name',
+                      deBounce: 600.miliseconds,
+                      width: optionsWidth,
+                      onChanged:(String text) => state.filterName(text),
+                    ),
+                    TWSInputText(
+                      label: 'Search by father lastname',
+                      deBounce: 600.miliseconds,
+                      width: optionsWidth,
+                      onChanged:(String text) => state.filterFather(text),
+                    ),
+                    TWSInputText(
+                      label: 'Search by mother lastname',
+                      deBounce: 600.miliseconds,
+                      width: optionsWidth,
+                      onChanged:(String text) => state.filterMother(text),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: _DriverArticleTablesAssembly(
+                agent: tableAgent,
+                state: state,
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }

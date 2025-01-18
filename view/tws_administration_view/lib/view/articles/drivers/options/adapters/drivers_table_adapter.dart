@@ -4,9 +4,14 @@ final SessionStorage _sessionStorage = SessionStorage.i;
 const List<String> _countryOptions = TWSAMessages.kCountryList;
 const List<String> _usaStateOptions = TWSAMessages.kUStateCodes;
 const List<String> _mxStateOptions = TWSAMessages.kMXStateCodes;
+
 class _AddresState extends CSMStateBase {}
 _AddresState _addresState = _AddresState();
 void Function() _addressEffect = () {};
+
+final class _DialogState extends CSMStateBase {}
+final _DialogState _dialogState = _DialogState();
+void Function() _dialogEffect = (){};
 
 final class _SituationsViewAdapter implements TWSAutocompleteAdapter{
   const _SituationsViewAdapter();
@@ -39,11 +44,12 @@ final class _SituationsViewAdapter implements TWSAutocompleteAdapter{
 
 /// [_TableAdapter] class stores cons umes the data and all the compose components for the table [Drivers] table.
 final class _TableAdapter extends TWSArticleTableAdapter<Driver> {
-  const _TableAdapter();
+  final _DriversArticleState state;
+  const _TableAdapter(this.state);
 
   @override
   Future<SetViewOut<Driver>> consume(int page, int range, List<SetViewOrderOptions> orderings) async {
-    final SetViewOptions<Driver> options = SetViewOptions<Driver>(false, range, page, null, orderings, <SetViewFilterNodeInterface<Driver>>[]);
+    final SetViewOptions<Driver> options = SetViewOptions<Driver>(false, range, page, null, orderings, state.driversFilters);
     String auth = _sessionStorage.session!.token;
     MainResolver<SetViewOut<Driver>> resolver = await Sources.foundationSource.drivers.view(options, auth);
 
@@ -58,542 +64,584 @@ final class _TableAdapter extends TWSArticleTableAdapter<Driver> {
 
   @override
   TWSArticleTableEditor? composeEditor(Driver set, void Function() closeReinvoke, BuildContext context) {
-
+    bool exceptionFlag = false;
+    String xMessage = '---';
     return TWSArticleTableEditor(
       onCancel: closeReinvoke,
       onSave: () async {
+        exceptionFlag = false;
+        xMessage = '---';
         showDialog(
           context: context,
           useRootNavigator: true,
           barrierDismissible: false,
           builder: (BuildContext context) {
-            return TWSConfirmationDialog(
-              accept: 'Update',
-              title: 'Driver update confirmation',
-              statement: Text.rich(
-                textAlign: TextAlign.center,
-                TextSpan(
-                    text: 'Are you sure you want to update a driver?',
-                  children: <InlineSpan>[
-                   const TextSpan(
-                      text: '\n',
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 License:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
+            _dialogEffect = state.effect;
+            return CSMDynamicWidget<_DialogState>(
+              state: _dialogState, 
+              designer:(BuildContext ctx, _DialogState state) {
+                return exceptionFlag? TWSConfirmationDialog(
+                  showCancelButton: false,
+                  accept: 'OK',
+                  title: 'Unexpected error on update.',
+                  statement: Text.rich(
+                    textAlign: TextAlign.center,
+                    TextSpan(
+                      text: 'Unexpected problem. Please retry the operation or contact your administrator.',
+                      children: <InlineSpan>[
+                        const TextSpan(
+                          text: '\n\nError message:\n\n',
+                          style: TextStyle(fontWeight: FontWeight.bold),                        
                         ),
-                        child: Text('\n${set.driverCommonNavigation?.license ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Driver type:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
+                        TextSpan(
+                         text: xMessage
                         ),
-                        child: Text('\n${set.driverType ?? "---"}'),
-                      ),
+
+                      ],
+                      
                     ),
-                    const TextSpan(
-                      text: '\n\u2022 Situation:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
+                  ),
+                  onAccept: () {
+                    Navigator.of(context).pop();
+                  },
+                ) : 
+                TWSConfirmationDialog(
+                  accept: 'Update',
+                  title: 'Driver update confirmation',
+                  statement: Text.rich(
+                    textAlign: TextAlign.center,
+                    TextSpan(
+                        text: 'Are you sure you want to update a driver?',
+                      children: <InlineSpan>[
+                      const TextSpan(
+                          text: '\n',
                         ),
-                        child: Text('\n${set.driverCommonNavigation?.situationNavigation?.name ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Licence expiration:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.licenseExpiration?.dateOnlyString ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Drugal reg. date:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.drugalcRegistrationDate?.dateOnlyString ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Pull notice reg. date:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.pullnoticeRegistrationDate?.dateOnlyString ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 TWIC number:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.twic ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 TWIC expiration:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.twicExpiration?.dateOnlyString ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 VISA number:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.visa ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 VISA expiration:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.visaExpiration?.dateOnlyString ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 FAST number:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.fast ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 FAST expiration:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.fastExpiration?.dateOnlyString ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 ANAM number:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.anam ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 ANAM expiration:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.anamExpiration?.dateOnlyString ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Name:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.identificationNavigation?.name ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Father lastname:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.identificationNavigation?.fatherlastname ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Mother lastname:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.identificationNavigation?.motherlastname ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Birthday:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.identificationNavigation?.birthday?.dateOnlyString ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Email:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.approachNavigation?.email ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Entreprise phone:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.approachNavigation?.enterprise ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Personal phone:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.approachNavigation?.personal ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Alternative contact:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.approachNavigation?.alternative ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Country:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.addressNavigation?.country ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 State:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.addressNavigation?.state ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Street:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.addressNavigation?.street ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Alt. Street:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.addressNavigation?.altStreet ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 City:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.addressNavigation?.city ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 ZIP:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.addressNavigation?.zip ?? "---"}'),
-                      ),
-                    ),
-                    const TextSpan(
-                      text: '\n\u2022 Colonia:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    WidgetSpan(
-                      baseline: TextBaseline.alphabetic,
-                      alignment: PlaceholderAlignment.bottom,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        child: Text('\n${set.employeeNavigation?.addressNavigation?.colonia ?? "---"}'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              onAccept: () async {
-                List<CSMSetValidationResult> evaluation = set.evaluate();
-                if (evaluation.isEmpty) {
-                  final String auth = _sessionStorage.getTokenStrict();
-                  MainResolver<RecordUpdateOut<Driver>> resolverUpdateOut =
-                      await Sources.foundationSource.drivers.update(set, auth);
-                  try {
-                    resolverUpdateOut
-                        .act((JObject json) =>
-                            RecordUpdateOut<Driver>.des(json, Driver.des))
-                        .then(
-                      (RecordUpdateOut<Driver> updateOut) {
-                        CSMRouter.i.pop();
-                      },
-                    );
-                  } catch (x) {
-                    debugPrint(x.toString());
-                  }
-                } else {
-                  // --> Evaluation error dialog
-                  CSMRouter.i.pop();
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return TWSConfirmationDialog(
-                        showCancelButton: false,
-                        accept: 'Ok',
-                        title: 'Invalid form data',
-                        statement: Text.rich(
-                          TextSpan(
-                            text: 'Verify the data form:\n\n',
-                            children: <InlineSpan>[
-                              for (int i = 0; i < evaluation.length; i++)
-                                TextSpan(
-                                  text:
-                                      "${i + 1} - ${evaluation[i].property}: ${evaluation[i].reason}\n",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600),
-                                ),
-                            ],
+                        const TextSpan(
+                          text: '\n\u2022 License:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                        onAccept: () {
-                          Navigator.of(context).pop();
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.driverCommonNavigation?.license ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Driver type:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.driverType ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Situation:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.driverCommonNavigation?.situationNavigation?.name ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Licence expiration:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.licenseExpiration?.dateOnlyString ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Drugal reg. date:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.drugalcRegistrationDate?.dateOnlyString ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Pull notice reg. date:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.pullnoticeRegistrationDate?.dateOnlyString ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 TWIC number:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.twic ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 TWIC expiration:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.twicExpiration?.dateOnlyString ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 VISA number:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.visa ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 VISA expiration:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.visaExpiration?.dateOnlyString ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 FAST number:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.fast ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 FAST expiration:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.fastExpiration?.dateOnlyString ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 ANAM number:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.anam ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 ANAM expiration:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.anamExpiration?.dateOnlyString ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Name:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.identificationNavigation?.name ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Father lastname:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.identificationNavigation?.fatherlastname ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Mother lastname:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.identificationNavigation?.motherlastname ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Birthday:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.identificationNavigation?.birthday?.dateOnlyString ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Email:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.approachNavigation?.email ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Entreprise phone:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.approachNavigation?.enterprise ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Personal phone:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.approachNavigation?.personal ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Alternative contact:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.approachNavigation?.alternative ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Country:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.addressNavigation?.country ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 State:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.addressNavigation?.state ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Street:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.addressNavigation?.street ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Alt. Street:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.addressNavigation?.altStreet ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 City:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.addressNavigation?.city ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 ZIP:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.addressNavigation?.zip ?? "---"}'),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '\n\u2022 Colonia:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        WidgetSpan(
+                          baseline: TextBaseline.alphabetic,
+                          alignment: PlaceholderAlignment.bottom,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text('\n${set.employeeNavigation?.addressNavigation?.colonia ?? "---"}'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  onAccept: () async {
+                    List<CSMSetValidationResult> evaluation = set.evaluate();
+                    if (evaluation.isEmpty) {
+                      final String auth = _sessionStorage.getTokenStrict();
+                      MainResolver<RecordUpdateOut<Driver>> resolverUpdateOut =
+                          await Sources.foundationSource.drivers.update(set, auth);
+                      try {
+                        resolverUpdateOut
+                            .act((JObject json) =>
+                                RecordUpdateOut<Driver>.des(json, Driver.des))
+                            .then(
+                          (RecordUpdateOut<Driver> updateOut) {
+                            CSMRouter.i.pop();
+                          },
+                        ).onError(
+                          (Object? x, _){
+                            exceptionFlag = true;
+                            xMessage = x.toString();
+                            _dialogEffect();
+                          }
+                        );
+                      } catch (x) {
+                        exceptionFlag = true;
+                        xMessage = x.toString();
+                        _dialogEffect();
+                      }
+                    } else {
+                      // --> Evaluation error dialog
+                      CSMRouter.i.pop();
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return TWSConfirmationDialog(
+                            showCancelButton: false,
+                            accept: 'Ok',
+                            title: 'Invalid form data',
+                            statement: Text.rich(
+                              TextSpan(
+                                text: 'Verify the data form:\n\n',
+                                children: <InlineSpan>[
+                                  for (int i = 0; i < evaluation.length; i++)
+                                    TextSpan(
+                                      text:
+                                          "${i + 1} - ${evaluation[i].property}: ${evaluation[i].reason}\n",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            onAccept: () {
+                              Navigator.of(context).pop();
+                            },
+                          );
                         },
                       );
-                    },
-                  );
-                }
+                    }
+                  },
+                );
               },
             );
           },

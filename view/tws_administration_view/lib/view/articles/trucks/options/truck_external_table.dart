@@ -20,21 +20,12 @@ class _TruckExternalTable extends StatelessWidget {
           (TruckExternal item, int index, BuildContext ctx) => item.truckCommonNavigation!.economic,
         ),
         TWSArticleTableFieldOptions<TruckExternal>(
-          'Carrier',
-          (TruckExternal item, int index, BuildContext ctx) => item.carrier,
-        ),
-        TWSArticleTableFieldOptions<TruckExternal>(
           'USA Plate',
           (TruckExternal item, int index, BuildContext ctx) => item.usaPlate ?? "---",
         ),
         TWSArticleTableFieldOptions<TruckExternal>(
           'MX Plate',
           (TruckExternal item, int index, BuildContext ctx) => item.mxPlate ?? "---",
-        ),
-        TWSArticleTableFieldOptions<TruckExternal>(
-          'VIN',
-          (TruckExternal item, int index, BuildContext ctx) => item.vin ?? '---',
-          true,
         ),
       ],
       page: 1,
