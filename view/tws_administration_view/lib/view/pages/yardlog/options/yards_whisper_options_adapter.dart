@@ -28,6 +28,9 @@ final class _DialogState extends CSMStateBase {}
 final _DialogState _dialogState = _DialogState();
 void Function() _dialogEffect = (){};
 
+final class _DamagePicState extends CSMStateBase {}
+final _DamagePicState _damagePicState = _DamagePicState();
+void Function() _damagePicEffect = (){};
 
 final class _TableAdapter extends TWSArticleTableAdapter<YardLog> {
   const _TableAdapter();
@@ -65,8 +68,6 @@ final class _TableAdapter extends TWSArticleTableAdapter<YardLog> {
   
   @override
   TWSArticleTableEditor? composeEditor(YardLog set, void Function() closeReinvoke, BuildContext context) {
-    Uint8List? truckPicture = _getBytes(set.ttPicture);
-    Uint8List? damagePicture = set.dmgEvidence != null? _getBytes(set.dmgEvidence!) : null;
     bool exceptionFlag = false;
     String xMessage = '---';
 
@@ -409,6 +410,7 @@ final class _TableAdapter extends TWSArticleTableAdapter<YardLog> {
                               set.damage = false;
                               set.dmgEvidence = null;
                               state.effect();
+                              _damagePicEffect();
                             } 
                           ),
                         ),
@@ -419,6 +421,7 @@ final class _TableAdapter extends TWSArticleTableAdapter<YardLog> {
                             onTap: (){
                               set.damage = true;
                               state.effect();
+                              _damagePicEffect();
                             } 
                           ),
                         ),
@@ -652,35 +655,47 @@ final class _TableAdapter extends TWSArticleTableAdapter<YardLog> {
                 content: CSMSpacingColumn(
                   spacing: 10,
                   children: <Widget>[
-                    if(truckPicture != null)
-                    Center(
-                      child: TWSImageViewer(
-                        align: TextAlign.left,
-                        height: 100,
-                        width: 300,
-                        img: truckPicture,
-                      ),
+                    TWSPhotoTaker(
+                      basePreview: set.ttPicture,
+                      cancelButtonEnable: false,
+                      onPhotoTaken: (XFile photo) async {
+                        Uint8List bytes = await photo.readAsBytes();base64Encode(bytes);
+                        set.ttPicture = base64Encode(bytes);
+                      },
+                      onCancel: () {
+                        // set.ttPicture = null;
+                      },
                     ),
-                  ] 
+                  ],
                 ),
               ),
-              if(damagePicture != null)
-              TWSSection(
-                title: 'Damage picture', 
-                content: CSMSpacingColumn(
-                  spacing: 10,
-                  children: <Widget>[
-                    if(truckPicture != null)
-                    Center(
-                      child: TWSImageViewer(
-                        align: TextAlign.left,
-                        height: 100,
-                        width: 300,
-                        img: damagePicture,
+              CSMDynamicWidget<_DamagePicState>(
+                state: _damagePicState, 
+                designer:(BuildContext ctx, _DamagePicState state) {
+                  _damagePicEffect = state.effect;
+                  return Visibility(
+                    visible: set.damage,
+                    child: TWSSection(
+                      title: 'Damage picture', 
+                      content: CSMSpacingColumn(
+                        spacing: 10,
+                        children: <Widget>[
+                          TWSPhotoTaker(
+                            basePreview: set.dmgEvidence,
+                            onPhotoTaken: (XFile photo) async {
+                              Uint8List bytes = await photo.readAsBytes();base64Encode(bytes);
+                              set.dmgEvidence = base64Encode(bytes);
+                            },
+                            onCancel: () {
+                              set.dmgEvidence = null;
+                              state.effect();
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                  ] 
-                ),
+                  );
+                },
               ),
             ],
           ),

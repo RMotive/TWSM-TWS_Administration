@@ -12,6 +12,7 @@
         - [TWSInputText]
         - [TWSSectionDivider]
         - [TWSImageViewer]
+        - [TWSPhotoTaker]
     3. Removed unnecesary whispers views:
         - Manufacturers
         - Situations
@@ -71,6 +72,9 @@
     43. Added [View] table, [Create] & [Update] whispers for [Locations] article.
     44. Added search filters to [View] table whispers for all articles in [Business] module.
     45. Added exceptions notifications in update forms in all articles for [Business] module.
+    46. Added [TWSFilePicker] widget to local files selections.
+    47. Added [TWSFilePicker] widget implemtation in [TWSPhotoTaker] widget.
+    48. TEMPORAL dependencies implementation: file_picker, camera_platform, camera_web.
 
 - Dependencies upgrade:
     1. (-) tws_foundation_client: Deprecated now used tws_foundation_client
