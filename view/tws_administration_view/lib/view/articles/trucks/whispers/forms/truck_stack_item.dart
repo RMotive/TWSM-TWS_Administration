@@ -24,7 +24,9 @@ class _TruckStackItem extends StatelessWidget {
     if (sct != null &&
         (sct.configuration.isNotEmpty &&
             sct.number.isNotEmpty &&
-            sct.type.isNotEmpty)) return sct.number;
+            sct.type.isNotEmpty)) {
+      return sct.number;
+    }
     return "---";
   }
 

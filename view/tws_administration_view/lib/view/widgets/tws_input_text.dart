@@ -139,7 +139,10 @@ class _TWSInputTextState extends State<TWSInputText> {
   @override
   Widget build(BuildContext context) {
     bool limitWarning = widget.maxLength != null && (ctrl.text.length+5 > widget.maxLength!);
-    Color counterColor = (!widget.isStrictLength && limitWarning)? Colors.yellow : (!widget.isStrictLength && !limitWarning)? pageColorStruct.fore.withOpacity(0.80)
+    Color counterColor = (!widget.isStrictLength && limitWarning)
+        ? Colors.yellow
+        : (!widget.isStrictLength && !limitWarning)
+            ? pageColorStruct.fore.withValues(alpha: .8)
     : (ctrl.text.length < (widget.maxLength ?? 0)) ? errorColorStruct.fore : Colors.green;
     return Material(
       color: Colors.transparent,
@@ -161,11 +164,11 @@ class _TWSInputTextState extends State<TWSInputText> {
               widget.onChanged?.call(typedText);
               return;
             }
-
+        
             if (_deBouncer?.isActive ?? false) {
               _deBouncer?.cancel();
             }
-
+        
             _deBouncer = Timer(
               widget.deBounce!,
               () {
@@ -178,24 +181,23 @@ class _TWSInputTextState extends State<TWSInputText> {
           maxLength: widget.maxLength,
           maxLines: widget.maxLines,
           style: TextStyle(
-            color: colorStruct.foreAlt?.withOpacity(.7),
+            color: colorStruct.foreAlt?.withValues(alpha: .7),
           ),
           decoration: InputDecoration(
             hintText: widget.hint,
-            labelText: !widget.isOptional || widget.suffixLabel == null? widget.label : null,
-            label: widget.suffixLabel != null? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(widget.label ?? ""),
-                Text(
-                  widget.suffixLabel!,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorStruct.foreAlt?.withOpacity(.5)
-                  ),
-                )
-              ],
-            ): null,
+            labelText: !widget.isOptional || widget.suffixLabel == null ? widget.label : null,
+            label: widget.suffixLabel != null
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(widget.label ?? ""),
+                      Text(
+                        widget.suffixLabel!,
+                        style: TextStyle(fontSize: 12, color: colorStruct.foreAlt?.withValues(alpha: .5)),
+                      )
+                    ],
+                  )
+                : null,
             errorText: widget.errorText,
             isDense: true,
             suffixIcon: widget.suffixIcon,
@@ -213,7 +215,7 @@ class _TWSInputTextState extends State<TWSInputText> {
             ),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                color: widget.showErrorColor? errorColorStruct.fore :colorStruct.highlight.withOpacity(.6),
+                color: widget.showErrorColor ? errorColorStruct.fore : colorStruct.highlight.withValues(alpha: .6),
                 width: borderWidth,
               ),
             ),
@@ -225,7 +227,7 @@ class _TWSInputTextState extends State<TWSInputText> {
             ),
             errorBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                color: errorColorStruct.highlight.withOpacity(.7),
+                color: errorColorStruct.highlight.withValues(alpha: .7),
                 width: borderWidth,
               ),
             ),

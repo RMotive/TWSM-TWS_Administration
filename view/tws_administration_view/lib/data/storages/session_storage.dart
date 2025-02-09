@@ -21,10 +21,10 @@ class SessionStorage {
   late final CSMAdvisor _advisor;
 
   /// Stores the current session that the manager works in.
-  Privileges? _session;
+  Session? _session;
 
   /// Current session.
-  Privileges? get session => _session;
+  Session? get session => _session;
 
   /// Wheter the application context has an active session
   late bool _isSession;
@@ -42,11 +42,11 @@ class SessionStorage {
     }
 
     JObject json = jsonDecode(sessionGather);
-    _session = Privileges.des(json);
+    _session = Session.des(json);
     _isSession = _evaluateExpiration(_session!.expiration);
   }
 
-  void storeSession(Privileges session) {
+  void storeSession(Session session) {
     _session = session;
     _isSession = _evaluateExpiration(session.expiration);
     localStorage.setItem(_kSessionItemStoreKey, jsonEncode(session.encode()));
