@@ -342,7 +342,7 @@ class _TWSAutoCompleteFieldState<T> extends State<TWSAutoCompleteField<T>> with 
                                                 //Only do the builder callback once.
                                                 //Stores the properties result to avoid unnecesary callbacks on rebuild.
                                                 for (SetViewOut<dynamic> view in data) {
-                                                  rawOptionsList = <T>[...rawOptionsList, ...view.sets];
+                                    rawOptionsList = <T>[...rawOptionsList, ...view.records];
                                                 }
                                                 _search(ctrl.text);
                                                 firstbuild = false;

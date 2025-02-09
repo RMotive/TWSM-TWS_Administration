@@ -104,12 +104,12 @@ class _TWSArticleTableState<TArticle extends CSMEncodeInterface> extends State<T
   }
 
   void _updatePagingChanges(SetViewOut<TArticle> data) {
-    if (items != data.amount || pages != data.pages || records != data.sets) {
+    if (items != data.count || pages != data.pages || records != data.records) {
       WidgetsBinding.instance.addPostFrameCallback(
         (Duration timeStamp) {
           setState(() {
-            records = data.sets;
-            items = data.amount;
+            records = data.records;
+            items = data.count;
             pages = data.pages;
           });
         },
@@ -139,14 +139,14 @@ class _TWSArticleTableState<TArticle extends CSMEncodeInterface> extends State<T
             height: constrains.minHeight,
           );
         }
-
+    
         final Size viewSize = pageBounds.biggest;
         final bool detailsFullDisplay = viewSize.width <= (_kDetailsWidth * 2);
         final Animation<double> detailsDisplayAnimation = Tween<double>(
           begin: 0,
           end: detailsFullDisplay ? viewSize.width : _kDetailsWidth,
         ).animate(detailsAnimationController);
-
+    
         return SizedBox(
           width: viewSize.width,
           child: AnimatedBuilder(
@@ -154,7 +154,7 @@ class _TWSArticleTableState<TArticle extends CSMEncodeInterface> extends State<T
             builder: (_, __) {
               final double animationComputationValue = viewSize.width - detailsDisplayAnimation.value;
               final double cellWidth = animationComputationValue / widget.fields.length;
-
+    
               return Stack(
                 children: <Widget>[
                   // --> Table
@@ -196,24 +196,24 @@ class _TWSArticleTableState<TArticle extends CSMEncodeInterface> extends State<T
                                       child: CSMConsumer<SetViewOut<TArticle>>(
                                         consume: consume,
                                         agent: agent,
-                                        emptyCheck: (SetViewOut<TArticle> data) => data.sets.isEmpty,
+                                        emptyCheck: (SetViewOut<TArticle> data) => data.records.isEmpty,
                                         loadingBuilder: (_) => _TWSArticleTableLoading(viewSize: viewSize),
                                         errorBuilder: (_, __, ___) => _TWSArticleTableError(
                                           viewSize: viewSize,
                                         ),
                                         successBuilder: (_, SetViewOut<TArticle> data) {
                                           _updatePagingChanges(data);
-
+    
                                           return SizedBox(
                                             height: pageBounds.maxHeight - 100,
                                             child: SingleChildScrollView(
                                               child: Column(
                                                 children: List<Widget>.generate(
-                                                  data.sets.length,
+                                                  data.length,
                                                   (int index) {
                                                     return CSMPointerHandler(
                                                       cursor: SystemMouseCursors.click,
-                                                      onClick: () => _selectRecord(index, data.sets[index]),
+                                                      onClick: () => _selectRecord(index, data.records[index]),
                                                       child: DecoratedBox(
                                                         decoration: BoxDecoration(
                                                           color: selected?.$1 == index ? Colors.blueGrey : Colors.transparent,
@@ -233,13 +233,13 @@ class _TWSArticleTableState<TArticle extends CSMEncodeInterface> extends State<T
                                                                       horizontal: 8,
                                                                     ),
                                                                     child: Builder(builder: (BuildContext context) {
-                                                                      final String cellValue = field.factory(data.sets[index], index, context);
+                                                                      final String cellValue = field.factory(data.records[index], index, context);
                                                                       final Widget textWidget = Text(
                                                                         cellValue,
                                                                         maxLines: 2,
                                                                         overflow: TextOverflow.ellipsis,
                                                                       );
-
+    
                                                                       if (!field.tip) {
                                                                         return textWidget;
                                                                       }

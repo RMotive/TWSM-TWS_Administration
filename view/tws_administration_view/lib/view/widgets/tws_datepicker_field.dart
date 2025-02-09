@@ -120,7 +120,7 @@ class _TWSDatepickerState extends State<TWSDatepicker> {
             cursorWidth: 3,
             cursorColor: colorStruct.foreAlt,
             style: TextStyle(
-              color: colorStruct.foreAlt?.withOpacity(.7),
+              color: colorStruct.foreAlt?.withValues(alpha: .7),
             ),
             onTap: () => _showDatePicker(),
             decoration: InputDecoration(
@@ -161,7 +161,7 @@ class _TWSDatepickerState extends State<TWSDatepicker> {
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: colorStruct.highlight.withOpacity(.6),
+                  color: colorStruct.highlight.withValues(alpha: .6),
                   width: borderWidth,
                 ),
               ),
@@ -173,7 +173,7 @@ class _TWSDatepickerState extends State<TWSDatepicker> {
               ),
               errorBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: errorColorStruct.highlight.withOpacity(.7),
+                  color: errorColorStruct.highlight.withValues(alpha: .7),
                   width: borderWidth,
                 ),
               ),

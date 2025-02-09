@@ -29,7 +29,7 @@ class TWSDisplayFlat extends StatelessWidget {
       ),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: baseColor.withOpacity(.3),
+          color: baseColor.withValues(alpha: .3),
           border: Border.fromBorderSide(
             BorderSide(
               color: baseColor,

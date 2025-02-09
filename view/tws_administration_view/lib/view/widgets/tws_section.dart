@@ -41,7 +41,7 @@ class TWSSection extends StatelessWidget {
     final TWSAThemeBase theme = getTheme();
     final CSMColorThemeOptions pageStruct = theme.page;
     final SectionThemeStruct? sectionStruct = theme.twsSectionStruct;
-    final Color borderColor = isOptional?  pageStruct.fore.withOpacity(0.50) : sectionStruct?.borderColor ?? pageStruct.highlight;
+    final Color borderColor = isOptional ? pageStruct.fore.withValues(alpha: .5) : sectionStruct?.borderColor ?? pageStruct.highlight;
     return Padding(
       padding: padding,
       child: DecoratedBox(

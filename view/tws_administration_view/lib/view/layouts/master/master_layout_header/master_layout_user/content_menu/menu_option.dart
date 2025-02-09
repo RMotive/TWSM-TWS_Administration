@@ -24,7 +24,7 @@ class _MenuOption extends StatelessWidget {
             elevation: 0,
             hoverElevation: 0,
             splashColor: const Color.fromARGB(0, 229, 216, 216),
-            hoverColor: color.withOpacity(0.1),
+            hoverColor: color.withValues(alpha: .1),
             backgroundColor: Colors.transparent,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             onPressed: onTap,

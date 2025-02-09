@@ -31,9 +31,9 @@ class TWSButtonFlat extends StatelessWidget {
 
     Color bgStateColorize(StatesSet currentStates) {
       final Color hlightColor = colorStruct.highlight;
-      final Color reducedColor = hlightColor.withOpacity(.7);
+      final Color reducedColor = hlightColor.withValues(alpha: .7);
       if (disabled) {
-        return reducedColor.withOpacity(0.3);
+        return reducedColor.withValues(alpha: .3);
       }
 
       return switch (currentStates) {

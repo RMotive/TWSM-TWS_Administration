@@ -12,6 +12,3 @@ class Sources {
     ),
   );
 }
-
-class TWSAdministrationSource {
-}
